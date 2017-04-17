@@ -12,9 +12,9 @@ public class Main {
                 .setLabel("Type")
                 .addParentType(Type.OBJECT);
 
-        // Needs to be done once, as Type.TYPE was null when these two types were created
-        Type.TYPE.type = Type.TYPE;
-        Type.OBJECT.type = Type.TYPE;
+        // Create SenseTypes for types Object and Type
+        SenseType stObject = new SenseType(Type.OBJECT, 0, null);
+        SenseType stType = new SenseType(Type.OBJECT, 0, null);
 
         Type.addType(Type.OBJECT);
         Type.addType(Type.TYPE);
@@ -26,18 +26,62 @@ public class Main {
 
         // ------------------------------------------------ //
 
+        // Semi-custom stuff
+        Type proposition = (new Type())
+                .setLabel("Proposition")
+                .addParentType(Type.OBJECT);
+
+        Type.addType(proposition);
+
+        SenseType stProposition = new SenseType(proposition, 0, null);
+
+        // Create TRUE and FALSE objects
+        Sense TRUE = new Sense(stProposition, null);
+        Sense FALSE = new Sense(stProposition, null);
+        mainScope.map(TRUE, new Referent());
+        mainScope.map(FALSE, new Referent());
+
+        // Define (partially) boolean algebra
+        SenseType and = new SenseType(proposition, 2, new Type[] { proposition, proposition });
+        SenseType or = new SenseType(proposition, 2, new Type[] { proposition, proposition });
+        SenseType not = new SenseType(proposition, 1, new Type[] { proposition });
+        // etc.
+
+        Sense AND1 = new Sense(and, new Sense[] {TRUE, TRUE}); mainScope.setEqual(AND1, TRUE);
+        Sense AND2 = new Sense(and, new Sense[] {TRUE, FALSE}); mainScope.setEqual(AND2, FALSE);
+        Sense AND3 = new Sense(and, new Sense[] {FALSE, TRUE}); mainScope.setEqual(AND3, FALSE);
+        Sense AND4 = new Sense(and, new Sense[] {FALSE, FALSE}); mainScope.setEqual(AND4, FALSE);
+
+        Sense OR1 = new Sense(or, new Sense[] {TRUE, TRUE}); mainScope.setEqual(OR1, TRUE);
+        Sense OR2 = new Sense(or, new Sense[] {TRUE, FALSE}); mainScope.setEqual(OR2, TRUE);
+        Sense OR3 = new Sense(or, new Sense[] {FALSE, TRUE}); mainScope.setEqual(OR3, TRUE);
+        Sense OR4 = new Sense(or, new Sense[] {FALSE, FALSE}); mainScope.setEqual(OR4, FALSE);
+
+        Sense NOT1 = new Sense(not, new Sense[] {TRUE}); mainScope.setEqual(NOT1, FALSE);
+        Sense NOT2 = new Sense(not, new Sense[] {FALSE}); mainScope.setEqual(NOT2, TRUE);
+
+        // ------------------------------------------------ //
+
 
         // Custom types and stuff
-
-
         Type set = (new Type())
                 .setLabel("Set")
-                .addParentType(Type.OBJECT)
-                .addProperty(new Property("elementType", Type.TYPE));
+                .addParentType(Type.OBJECT);
 
-        Term setA = new Term(set);
+        Type.addType(set);
 
-        mainScope.addTerm(setA);
+        SenseType stSet = new SenseType(set, 0, null);
+
+        Sense A = new Sense(stSet, null);
+        mainScope.map(A, new Referent());
+
+        SenseType stIn = new SenseType(proposition, 2, new Type[] { Type.OBJECT, set});
+
+
+        // ------------------------------------------------ //
+
+        // Some tests
+
 
     }
 }

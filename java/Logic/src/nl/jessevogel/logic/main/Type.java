@@ -5,7 +5,7 @@ import nl.jessevogel.logic.log.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Type extends Term {
+public class Type {
 
     public static Type OBJECT;
     public static Type TYPE;
@@ -14,15 +14,14 @@ public class Type extends Term {
 
     public String label;
     public ArrayList<Type> parents;
-    public ArrayList<Property> properties;
 
     public Type() {
-        super(TYPE);
+        // Create an empty list of parents
         parents = new ArrayList<Type>();
-        properties = new ArrayList<Property>();
     }
 
     public Type setLabel(String label) {
+        // Check if the label has already been set
         if(this.label != null) {
             Log.warning("Resetting label of type '" + this.label + "' to '" + label + "'");
         }
@@ -47,15 +46,6 @@ public class Type extends Term {
             Log.warning("Type '" + parent.label + "' is already a parent of type '" + label + "'");
         else
             parents.add(parent);
-
-        return this;
-    }
-
-    public Type addProperty(Property property) {
-        if(properties.contains(property))
-            Log.warning("'" + property.label + "' is already a property of type '" + label + "'");
-        else
-            properties.add(property);
 
         return this;
     }
