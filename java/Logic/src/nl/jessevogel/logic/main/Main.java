@@ -1,8 +1,12 @@
 package nl.jessevogel.logic.main;
 
+import java.util.HashSet;
+
 public class Main {
 
     public static void main(String[] args) {
+        // Initialize some stuff
+        Sense.senses = new HashSet<Sense>();
 
         // Create standard types
         Type.OBJECT = (new Type())

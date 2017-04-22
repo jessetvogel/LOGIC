@@ -2,7 +2,11 @@ package nl.jessevogel.logic.main;
 
 import nl.jessevogel.logic.log.Log;
 
+import java.util.Set;
+
 public class Sense {
+
+    public static Set<Sense> senses;
 
     public SenseType senseType;
     public Sense[] dependencies;
