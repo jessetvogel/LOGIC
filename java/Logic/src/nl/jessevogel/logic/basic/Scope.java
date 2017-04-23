@@ -1,10 +1,6 @@
-package nl.jessevogel.logic.main;
-
-import nl.jessevogel.logic.log.Log;
+package nl.jessevogel.logic.basic;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Scope {
 

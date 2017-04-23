@@ -1,4 +1,4 @@
-package nl.jessevogel.logic.main;
+package nl.jessevogel.logic.basic;
 
 import nl.jessevogel.logic.log.Log;
 

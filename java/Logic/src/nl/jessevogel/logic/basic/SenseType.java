@@ -1,6 +1,4 @@
-package nl.jessevogel.logic.main;
-
-import java.util.HashMap;
+package nl.jessevogel.logic.basic;
 
 public class SenseType {
 

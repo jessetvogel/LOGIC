@@ -1,5 +1,9 @@
 package nl.jessevogel.logic.main;
 
+import nl.jessevogel.logic.basic.*;
+import nl.jessevogel.logic.interpreter.FileManager;
+import nl.jessevogel.logic.interpreter.Interpreter;
+
 import java.util.HashSet;
 
 public class Main {
@@ -83,6 +87,13 @@ public class Main {
 
 
         // ------------------------------------------------ //
+
+        // Read main.math
+        FileManager.loadRootFile();
+
+
+        // ------------------------------------------------ //
+
 
         // Some tests
 
