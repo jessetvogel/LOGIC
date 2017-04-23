@@ -6,12 +6,13 @@ import java.util.ArrayList;
 
 public class Lexer {
 
+    private Interpreter interpreter;
     private Scanner scanner;
     private ArrayList<Token> tokens;
     private char currentChar;
 
     private static final Token TOKEN_IGNORE = new Token();
-    private static final String specialCharacters = "(){}[]<>._-+*/\\^";
+    private static final String specialCharacters = "(){}[]<>.,_-+*/\\^";
     private static final String wordCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     private int amountOfTokens;
@@ -21,6 +22,14 @@ public class Lexer {
     public Lexer(String filename) {
         // Setup for analyzing
         scanner = new Scanner(filename);
+    }
+
+    public void setInterpreter(Interpreter interpreter) {
+        // Check if interpreter was already set, if so, give a warning
+        if(this.interpreter != null)
+            Log.warning("Trying to set interpreter, while it was already set");
+
+        this.interpreter = interpreter;
     }
 
     public void analyze() {
@@ -66,9 +75,9 @@ public class Lexer {
         if (currentChar == '#' && scanner.getColumn() == 0) {
             int currentLine = scanner.getLine();
             currentChar = scanner.nextCharacter();
-            while (scanner.getLine() == currentLine)
+            while(scanner.getLine() == currentLine)
                 currentChar = scanner.nextCharacter();
-            Log.debug("Comment found"); // TODO: remove this line
+
             return TOKEN_IGNORE;
         }
 
@@ -127,6 +136,11 @@ public class Lexer {
         return position;
     }
 
+    public Interpreter getInterpreter() {
+        // Return the interpreter
+        return interpreter;
+    }
+
     public boolean reachedEnd() {
         return position == amountOfTokens;
     }
@@ -134,14 +148,19 @@ public class Lexer {
     public String createString(int startPosition, int endPosition) {
         // Create a string by concatenating the contents of the tokens between start and end position
         StringBuilder sb = new StringBuilder();
-        for(int i = startPosition;i < endPosition;i ++) {
+        for (int i = startPosition; i < endPosition; i++) {
             Token token = tokens.get(i);
-            if(token instanceof Token.CharToken)
+            if (token instanceof Token.CharToken)
                 sb.append(((Token.CharToken) token).c);
 
-            if(token instanceof Token.StringToken)
+            if (token instanceof Token.StringToken)
                 sb.append(((Token.StringToken) token).str);
         }
         return sb.toString();
+    }
+
+    public Token tokenAt(int position) {
+        // Return the token at the given position
+        return tokens.get(position);
     }
 }

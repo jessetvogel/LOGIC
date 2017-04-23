@@ -9,36 +9,55 @@ public class Type {
 
     public static Type OBJECT;
     public static Type TYPE;
+    public static Type PROPOSITION;
 
-    public static HashMap<String, Type> types = new HashMap<String, Type>();
+    public static HashMap<String, Type> labels = new HashMap<>();
 
-    public String label;
-    public ArrayList<Type> parents;
+    private String label;
+    private ArrayList<Type> parents;
+    private Relation senseType;
 
     public Type() {
         // Create an empty list of parents
-        parents = new ArrayList<Type>();
+        parents = new ArrayList<>();
     }
 
     public Type setLabel(String label) {
         // Check if the label has already been set
         if(this.label != null) {
-            Log.warning("Resetting label of type '" + this.label + "' to '" + label + "'");
+            Log.warning("Label of Type '" + this.label + "' was already set");
+            return this;
         }
 
+        // Check if the label is already used
+        if(labels.containsKey(label)) {
+            Log.warning("Label '" + label + "' is already used");
+            return this;
+        }
+
+        // Set label, and add it to the HashMap
         this.label = label;
+        labels.put(label, this);
         return this;
     }
 
-    public Type getType(String label) {
-        Type type = types.get(label);
-        if(type == null) {
-            Log.error("No type '" + label + "' found");
-            return null;
-        }
-        else {
-            return type;
-        }
+    public String getLabel() {
+        // Return label
+        return label;
+    }
+
+    public Type setRelation(Relation senseType) {
+        // If already set, give a warning
+        if(this.senseType != null)
+            Log.warning("Setting Relation of Type '" + label + "', while it was already set");
+
+        this.senseType = senseType;
+        return this;
+    }
+
+    public Relation getRelation() {
+        // Return the relation
+        return senseType;
     }
 
     public Type addParentType(Type parent) {
@@ -62,14 +81,18 @@ public class Type {
         return false;
     }
 
-    public static boolean addType(Type type) {
-        if(types.containsKey(type.label)) {
-            Log.error("Type '" + type.label + "' was already defined");
-            return false;
+    public static boolean exists(String label) {
+        return labels.containsKey(label);
+    }
+
+    public static Type getType(String label) {
+        Type type = labels.get(label);
+        if(type == null) {
+            Log.error("No type '" + label + "' found");
+            return null;
         }
         else {
-            types.put(type.label, type);
-            return true;
+            return type;
         }
     }
 }

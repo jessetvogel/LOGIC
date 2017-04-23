@@ -2,101 +2,60 @@ package nl.jessevogel.logic.main;
 
 import nl.jessevogel.logic.basic.*;
 import nl.jessevogel.logic.interpreter.FileManager;
-import nl.jessevogel.logic.interpreter.Interpreter;
-
-import java.util.HashSet;
 
 public class Main {
 
     public static void main(String[] args) {
-        // Initialize some stuff
-        Sense.senses = new HashSet<Sense>();
 
-        // Create standard types
-        Type.OBJECT = (new Type())
-                .setLabel("Object");
+        // Create standard labels
+        Type.OBJECT = new Type();
+        Type.TYPE = new Type();
+        Type.PROPOSITION = new Type();
 
-        Type.TYPE = (new Type())
+        Relation relationObject = new Relation(Type.OBJECT, null);
+        Relation relationType = new Relation(Type.TYPE, null);
+        Relation relationProposition = new Relation(Type.PROPOSITION, null);
+
+        Type.OBJECT
+                .setLabel("Object")
+                .setRelation(relationObject);
+
+        Type.TYPE
                 .setLabel("Type")
-                .addParentType(Type.OBJECT);
+                .addParentType(Type.OBJECT)
+                .setRelation(relationType);
 
-        // Create SenseTypes for types Object and Type
-        SenseType stObject = new SenseType(Type.OBJECT, 0, null);
-        SenseType stType = new SenseType(Type.OBJECT, 0, null);
-
-        Type.addType(Type.OBJECT);
-        Type.addType(Type.TYPE);
-
-
-        // Create the main scope
-        Scope mainScope = new Scope();
-
-
-        // ------------------------------------------------ //
-
-        // Semi-custom stuff
-        Type proposition = (new Type())
+        Type.PROPOSITION
                 .setLabel("Proposition")
-                .addParentType(Type.OBJECT);
+                .addParentType(Type.OBJECT)
+                .setRelation(relationProposition);
 
-        Type.addType(proposition);
+        // Create 'true' and 'false' objects
+        Sense.TRUE = new Sense(relationProposition, null);
+        Sense.FALSE = new Sense(relationProposition, null);
 
-        SenseType stProposition = new SenseType(proposition, 0, null);
+        // Create the main scope and set some labels and referents
+        Scope.main = new Scope();
 
-        // Create TRUE and FALSE objects
-        Sense TRUE = new Sense(stProposition, null);
-        Sense FALSE = new Sense(stProposition, null);
-        mainScope.map(TRUE, new Referent());
-        mainScope.map(FALSE, new Referent());
+        Scope.main.nameSense(Type.OBJECT.getLabel(), new Sense(Type.TYPE.getRelation(),null));
+        Scope.main.nameSense(Type.TYPE.getLabel(), new Sense(Type.TYPE.getRelation(),null));
+        Scope.main.nameSense(Type.PROPOSITION.getLabel(), new Sense(Type.TYPE.getRelation(),null));
+
+        Scope.main.map(Sense.TRUE, new Referent());
+        Scope.main.map(Sense.FALSE, new Referent());
+
+        Scope.main.nameSense("true", Sense.TRUE);
+        Scope.main.nameSense("false", Sense.FALSE);
 
         // Define (partially) boolean algebra
-        SenseType and = new SenseType(proposition, 2, new Type[] { proposition, proposition });
-        SenseType or = new SenseType(proposition, 2, new Type[] { proposition, proposition });
-        SenseType not = new SenseType(proposition, 1, new Type[] { proposition });
-        // etc.
-
-        Sense AND1 = new Sense(and, new Sense[] {TRUE, TRUE}); mainScope.setEqual(AND1, TRUE);
-        Sense AND2 = new Sense(and, new Sense[] {TRUE, FALSE}); mainScope.setEqual(AND2, FALSE);
-        Sense AND3 = new Sense(and, new Sense[] {FALSE, TRUE}); mainScope.setEqual(AND3, FALSE);
-        Sense AND4 = new Sense(and, new Sense[] {FALSE, FALSE}); mainScope.setEqual(AND4, FALSE);
-
-        Sense OR1 = new Sense(or, new Sense[] {TRUE, TRUE}); mainScope.setEqual(OR1, TRUE);
-        Sense OR2 = new Sense(or, new Sense[] {TRUE, FALSE}); mainScope.setEqual(OR2, TRUE);
-        Sense OR3 = new Sense(or, new Sense[] {FALSE, TRUE}); mainScope.setEqual(OR3, TRUE);
-        Sense OR4 = new Sense(or, new Sense[] {FALSE, FALSE}); mainScope.setEqual(OR4, FALSE);
-
-        Sense NOT1 = new Sense(not, new Sense[] {TRUE}); mainScope.setEqual(NOT1, FALSE);
-        Sense NOT2 = new Sense(not, new Sense[] {FALSE}); mainScope.setEqual(NOT2, TRUE);
-
-        // ------------------------------------------------ //
-
-
-        // Custom types and stuff
-        Type set = (new Type())
-                .setLabel("Set")
-                .addParentType(Type.OBJECT);
-
-        Type.addType(set);
-
-        SenseType stSet = new SenseType(set, 0, null);
-
-        Sense A = new Sense(stSet, null);
-        mainScope.map(A, new Referent());
-
-        SenseType stIn = new SenseType(proposition, 2, new Type[] { Type.OBJECT, set});
-
-
-        // ------------------------------------------------ //
+        Relation.NOT = (new Relation(Type.PROPOSITION, new Type[] { Type.PROPOSITION }))
+                .setLabel("not");
+        Relation.OR = (new Relation(Type.PROPOSITION, new Type[] { Type.PROPOSITION, Type.PROPOSITION }))
+                .setLabel("or");
+        Relation.AND = (new Relation(Type.PROPOSITION, new Type[] { Type.PROPOSITION, Type.PROPOSITION }))
+                .setLabel("and");
 
         // Read main.math
         FileManager.loadRootFile();
-
-
-        // ------------------------------------------------ //
-
-
-        // Some tests
-
-
     }
 }

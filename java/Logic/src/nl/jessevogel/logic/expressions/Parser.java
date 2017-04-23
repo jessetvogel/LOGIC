@@ -41,7 +41,7 @@ public class Parser {
         // Check for something of the form "<Type>"
         Matcher m = patternType.matcher(part);
         if(m.find()) {
-            Type type = Type.types.get(m.group(1));
+            Type type = Type.labels.get(m.group(1));
             if(type != null) {
                 expression.addTerm(new Expression.TypeTerm(null));
                 return;

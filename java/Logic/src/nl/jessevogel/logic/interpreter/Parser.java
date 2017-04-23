@@ -1,5 +1,6 @@
 package nl.jessevogel.logic.interpreter;
 
+import nl.jessevogel.logic.commands.*;
 import nl.jessevogel.logic.log.Log;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ public class Parser {
     public static final char CHARACTER_START_ARGUMENT = '[';
     public static final char CHARACTER_END_ARGUMENT = ']';
 
+    private Interpreter interpreter;
     private final Lexer lexer;
     private ArrayList<Command> commands;
     private Token currentToken;
@@ -18,6 +20,16 @@ public class Parser {
     public Parser(String filename) {
         // Setup for parsing
         lexer = new Lexer(filename);
+    }
+
+    public void setInterpreter(Interpreter interpreter) {
+        // Check if interpreter was already set, if so, give a warning
+        if(this.interpreter != null)
+            Log.warning("Trying to set interpreter, while it was already set");
+
+        // Set interpreter, as well as the lexer's
+        this.interpreter = interpreter;
+        lexer.setInterpreter(interpreter);
     }
 
     public void parse() {
@@ -44,15 +56,9 @@ public class Parser {
         // Check for a new command
         if(currentToken instanceof Token.StringToken) {
             Token.StringToken strToken = (Token.StringToken) currentToken;
-            Command command = null;
-
-            // Define a number of commands
-            if(strToken.str.equals("Include"))
-                command = (new Command()).setType(Command.Type.INCLUDE);
-
-            // If it did not match any of the above, give an error
+            Command command = Command.create(strToken.str);
             if(command == null) {
-                Log.warning("Command '" + strToken.str + "' was not defined");
+                Log.warning("Command '" + strToken.str + "' is undefined");
                 return null;
             }
 
@@ -67,7 +73,7 @@ public class Parser {
 
             // If the number of arguments does not match, give a warning
             if(argument != command.getAmountOfArguments()) {
-                Log.warning("Command of type " + command.getType() + " expects " + command.getAmountOfArguments() + " arguments, but " + argument + " were given");
+                Log.warning("Command of type " + command.getCommandName() + " expects " + command.getAmountOfArguments() + " arguments, but " + argument + " were given");
                 return null;
             }
 
@@ -84,7 +90,6 @@ public class Parser {
         if(!(currentToken instanceof Token.CharToken)) return false;
         Token.CharToken cToken = (Token.CharToken) currentToken;
         if(cToken.c != CHARACTER_START_ARGUMENT) return false;
-
 
         currentToken = lexer.nextToken();
 

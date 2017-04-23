@@ -2,33 +2,37 @@ package nl.jessevogel.logic.basic;
 
 import nl.jessevogel.logic.log.Log;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Sense {
 
-    public static Set<Sense> senses;
+    public static Sense TRUE;
+    public static Sense FALSE;
 
-    public SenseType senseType;
+    public static Set<Sense> senses = new HashSet<>();
+
+    public Relation relation;
     public Sense[] dependencies;
 
-    public Sense(SenseType senseType, Sense[] senses) {
-        // Copy the SenseType
-        this.senseType = senseType;
+    public Sense(Relation relation, Sense[] senses) {
+        // Copy the Relation
+        this.relation = relation;
 
         // Check if the correct number of senses is provided
         int sensesLength = senses == null ? 0 : senses.length;
-        if(sensesLength != senseType.amountOfDependencies) {
-            Log.warning("Unexpected number of dependencies given, expected " + senseType.amountOfDependencies + ", but given " + sensesLength);
+        if(sensesLength != relation.amountOfDependencies) {
+            Log.warning("Unexpected number of dependencies given, expected " + relation.amountOfDependencies + ", but given " + sensesLength);
             return;
         }
 
         // Copy the dependencies
         if(senses != null) {
-            dependencies = new Sense[senseType.amountOfDependencies];
-            for (int i = 0; i < senseType.amountOfDependencies; i++) {
-                // Check if the senses given have the correct type, as expected by senseType
-                if (!senses[i].senseType.type.isOfType(senseType.dependenciesType[i])) {
-                    Log.warning("Unexpected Sense given, expected of type '" + senseType.dependenciesType[i].label + "', but given of type '" + senses[i].senseType.type.label + "'");
+            dependencies = new Sense[relation.amountOfDependencies];
+            for (int i = 0; i < relation.amountOfDependencies; i++) {
+                // Check if the senses given have the correct type, as expected by relation
+                if (!senses[i].relation.getType().isOfType(relation.dependenciesType[i])) {
+                    Log.warning("Unexpected Sense given, expected of type '" + relation.dependenciesType[i].getLabel() + "', but given of type '" + senses[i].relation.getType().getLabel() + "'");
                     return;
                 }
                 dependencies[i] = senses[i];

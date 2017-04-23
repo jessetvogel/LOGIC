@@ -1,16 +1,23 @@
-package nl.jessevogel.logic.interpreter;
+package nl.jessevogel.logic.commands;
 
+import nl.jessevogel.logic.interpreter.Lexer;
 import nl.jessevogel.logic.log.Log;
 
-public class Command {
+public abstract class Command {
 
-    private Type type;
-    private Lexer lexer;
-    private int amountOfArguments;
-    private int[] startPositions, endPositions;
+    protected String commandName;
+    protected int amountOfArguments;
+    protected Lexer lexer;
+    protected int[] startPositions, endPositions;
 
-    public enum Type {
-        INCLUDE
+    public void createPositionArrays() {
+        // Create arrays of positions and set the initial values to -1
+        if(amountOfArguments > 0) {
+            startPositions = new int[amountOfArguments];
+            endPositions = new int[amountOfArguments];
+            for(int i = 0;i < amountOfArguments;i ++)
+                startPositions[i] = endPositions[i] = -1;
+        }
     }
 
     public Command setLexer(Lexer lexer) {
@@ -19,48 +26,10 @@ public class Command {
         return this;
     }
 
-    public Command setType(Type type) {
-        // If type was already set, give a warning
-        if(this.type != null) {
-            Log.warning("Setting type of command to " + type + " while it was already set to " + this.type);
-        }
-
-        // Store type and set amount of arguments
-        this.type = type;
-        amountOfArguments = -1;
-        switch(type) {
-            case INCLUDE:
-                amountOfArguments = 1;
-                break;
-        }
-
-        // If amountOfArguments was not set, give an error
-        if(amountOfArguments < 0) {
-            Log.error("Amount of arguments not defined for Command of type " + type);
-            return this;
-        }
-
-        // Create arrays of positions and set the initial values to -1
-        if(amountOfArguments > 0) {
-            startPositions = new int[amountOfArguments];
-            endPositions = new int[amountOfArguments];
-            for(int i = 0;i < amountOfArguments;i ++)
-                startPositions[i] = endPositions[i] = -1;
-        }
-
-        return this;
-    }
-
     public Command setArgument(int argument, int startPosition, int endPosition) {
-        // First check if type is already determined. If not, give a warning.
-        if(type == null) {
-            Log.warning("Trying to add argument to Command, but its type was not yet set");
-            return this;
-        }
-
         // Check if argument falls into the correct range
         if(argument < 0 || argument >= amountOfArguments) {
-            Log.warning("Command of type " + type + " requires " + amountOfArguments + " arguments, but tried to set argument " + argument);
+            Log.warning("Command " + commandName + " requires " + amountOfArguments + " arguments, but tried to set argument " + (argument + 1));
             return this;
         }
 
@@ -90,11 +59,6 @@ public class Command {
         return amountOfArguments;
     }
 
-    public Type getType() {
-        // Return the type
-        return type;
-    }
-
     public int getStartPosition(int argument) {
         // Check if argument falls in correct range
         if(argument < 0 || argument >= amountOfArguments) {
@@ -115,5 +79,24 @@ public class Command {
 
         // Return the starting position of the argument
         return endPositions[argument];
+    }
+
+    public String getCommandName() {
+        // Return the command name
+        return commandName;
+    }
+
+    public abstract boolean execute();
+
+    public static Command create(String commandName) {
+        // A list of allowed commands
+        if(commandName.equals("Include")) return new Include();
+        if(commandName.equals("DefineType")) return new DefineType();
+        if(commandName.equals("SetParentType")) return new SetParentType();
+        if(commandName.equals("DefineRelation")) return new DefineRelation();
+        if(commandName.equals("Let")) return new Let();
+
+        // If not in the list, return null
+        return null;
     }
 }

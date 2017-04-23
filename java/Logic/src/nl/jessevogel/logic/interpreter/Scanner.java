@@ -92,7 +92,7 @@ public class Scanner {
         pointer ++;
         if(reachedEnd()) return 0;
         if(currentChar == CHARACTER_NEWLINE) {
-            line = 0;
+            line ++;
             column = 0;
         }
         else {
