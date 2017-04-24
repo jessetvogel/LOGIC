@@ -25,20 +25,20 @@ public class SetParentType extends Command {
         String childTypeLabel = lexer.createString(startPositions[0], endPositions[0]);
         Type childType = Type.getType(childTypeLabel);
         if(childType == null) {
-            Log.warning("Type '" + childTypeLabel + "' is undefined");
+            lexer.getInterpreter().error(lexer.tokenAt(startPositions[0]), "Type '" + childTypeLabel + "' is undefined");
             return false;
         }
 
         String parentTypeLabel = lexer.createString(startPositions[1], endPositions[1]);
         Type parentType = Type.getType(parentTypeLabel);
         if(parentType == null) {
-            Log.warning("Type '" + parentTypeLabel + "' is undefined");
+            lexer.getInterpreter().error(lexer.tokenAt(startPositions[1]), "Type '" + parentTypeLabel + "' is undefined");
             return false;
         }
 
         // Check if the child is not already a parent of the parent (then we create an vicious circle)
         if(parentType.isOfType(childType)) {
-            Log.warning("Tried to set '" + parentTypeLabel + "' as parent of '" + childTypeLabel + "' while it is already its child");
+            lexer.getInterpreter().error(lexer.tokenAt(startPositions[0] - 2), "Tried to set '" + parentTypeLabel + "' as parent of '" + childTypeLabel + "' while it is already its child"); // TODO: use better method to find correct token
             return false;
         }
 

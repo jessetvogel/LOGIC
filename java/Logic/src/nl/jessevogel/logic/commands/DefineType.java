@@ -30,13 +30,13 @@ public class DefineType extends Command {
         // Construct label for Type
         String label = lexer.createString(startPositions[0], endPositions[0]);
         if(Type.exists(label)) {
-            Log.warning("Type '" + label + "' was already defined"); // TODO: replace all Log.warning(x)'s with something like interpreter.error(x), which then automatically outputs the file and line number at which the error occurs
+            lexer.getInterpreter().error(lexer.tokenAt(startPositions[0]), "Type '" + label + "' was already defined");
             return false;
         }
 
         // Check if the label has the correct type name pattern
         if(!patternTypeName.matcher(label).find()) {
-            Log.warning("Type label may only contain alphanumerical characters");
+            lexer.getInterpreter().error(lexer.tokenAt(startPositions[0]), "Type label may only contain alphanumerical characters");
             return false;
         }
 

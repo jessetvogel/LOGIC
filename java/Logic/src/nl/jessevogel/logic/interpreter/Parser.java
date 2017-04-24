@@ -55,10 +55,10 @@ public class Parser {
 
         // Check for a new command
         if(currentToken instanceof Token.StringToken) {
-            Token.StringToken strToken = (Token.StringToken) currentToken;
-            Command command = Command.create(strToken.str);
+            Token.StringToken commandNameToken = (Token.StringToken) currentToken;
+            Command command = Command.create(commandNameToken.str);
             if(command == null) {
-                Log.warning("Command '" + strToken.str + "' is undefined");
+                interpreter.error(commandNameToken,"Command '" + commandNameToken.str + "' is undefined");
                 return null;
             }
 
@@ -73,7 +73,7 @@ public class Parser {
 
             // If the number of arguments does not match, give a warning
             if(argument != command.getAmountOfArguments()) {
-                Log.warning("Command of type " + command.getCommandName() + " expects " + command.getAmountOfArguments() + " arguments, but " + argument + " were given");
+                interpreter.error(commandNameToken, "Command of type " + command.getCommandName() + " expects " + command.getAmountOfArguments() + " arguments, but " + argument + " were given");
                 return null;
             }
 
@@ -81,7 +81,7 @@ public class Parser {
         }
 
         // Could not find command
-        Log.warning("Unexpected token, expected a Command (TODO: at what line and at what position)");
+        interpreter.error(currentToken, "Unexpected token, expected a command");
         return null;
     }
 
@@ -102,7 +102,7 @@ public class Parser {
 
         // If we reached the end before the argument ended, give a warning
         if(lexer.reachedEnd()) {
-            Log.warning("File ended before end of the argument");
+            interpreter.error(currentToken, "File ended before end of the argument");
             return false;
         }
 

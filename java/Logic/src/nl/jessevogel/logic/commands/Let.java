@@ -1,5 +1,7 @@
 package nl.jessevogel.logic.commands;
 
+import nl.jessevogel.logic.basic.Referent;
+import nl.jessevogel.logic.basic.Scope;
 import nl.jessevogel.logic.basic.Sense;
 import nl.jessevogel.logic.basic.Type;
 import nl.jessevogel.logic.log.Log;
@@ -25,20 +27,18 @@ public class Let extends Command {
         String typeLabel = lexer.createString(startPositions[0], endPositions[0]);
         Type type = Type.getType(typeLabel);
         if(type == null) {
-            Log.warning("Type '" + typeLabel + "' is undefined");
+            lexer.getInterpreter().error(lexer.tokenAt(startPositions[0]), "Type '" + typeLabel + "' is undefined");
             return false;
         }
 
         String label = lexer.createString(startPositions[1], endPositions[1]);
         Sense sense = new Sense(type.getRelation(), null);
 
-        // TODO: find reference to mainScope
-
         // Map the sense to a new referent
-        // mainScope.map(sense, new Referent());
+        Scope.main.map(sense, new Referent());
 
         // Map label to this sense
-        // (...).map(label, sense);
+        Scope.main.labels.put(label, sense);
 
         return true;
     }

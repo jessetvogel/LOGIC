@@ -83,7 +83,9 @@ public class Lexer {
 
         // Check for special characters
         if (specialCharacters.indexOf(currentChar) != -1) {
-            Token token = new Token.CharToken(currentChar);
+            Token token = (new Token.CharToken(currentChar))
+                    .setLine(scanner.getLine())
+                    .setColumn(scanner.getColumn() - 1);
             currentChar = scanner.nextCharacter();
             return token;
         }
@@ -97,18 +99,20 @@ public class Lexer {
                 sb.append(currentChar);
                 currentChar = scanner.nextCharacter();
             }
-            return new Token.StringToken(sb.toString());
+            return (new Token.StringToken(sb.toString()))
+                    .setLine(scanner.getLine())
+                    .setColumn(scanner.getColumn() - sb.length());
         }
 
         // If none of the above was the case, give a warning
-        Log.warning("Unexpected symbol '" + currentChar + "' in " + scanner.getFilename() + " at line " + scanner.getLine() + " at position " + scanner.getColumn());
+        interpreter.error(scanner.getLine(), scanner.getColumn(),"Unexpected symbol '" + currentChar + "'");
         return null;
     }
 
     public Token firstToken() {
         if(tokens == null) {
             // If not yet analyzed, give a warning, and then analyze
-            Log.warning("Scanner.firstCharacter() was called, but there was not yet scanned");
+            Log.warning("Scanner.firstToken() was called, but there was not yet analyzed");
             analyze();
         }
 

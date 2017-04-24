@@ -2,6 +2,27 @@ package nl.jessevogel.logic.interpreter;
 
 public class Token {
 
+    private int line;
+    private int column;
+
+    public int getLine() {
+        return line;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
+    public Token setLine(int line) {
+        this.line = line;
+        return this;
+    }
+
+    public Token setColumn(int column) {
+        this.column = column;
+        return this;
+    }
+
     public static class CharToken extends Token {
 
         public final char c;

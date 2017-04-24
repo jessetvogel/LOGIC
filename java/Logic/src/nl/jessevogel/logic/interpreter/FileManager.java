@@ -12,23 +12,16 @@ public class FileManager {
     public static ArrayList<String> loadedFiles = new ArrayList<>();
 
     public static boolean loadFile(String filename) {
-        // If the file was already loaded, give a warning that there was some recursion detected
-        if(loadedFiles.contains(filename)) {
-            Log.warning("File " + filename + " was already loaded");
-            return false;
-        }
+        // If the file was already loaded, just return true
+        if(loadedFiles.contains(filename)) return true;
 
         // Check if the file exists before attempting to interpret it
         File file = new File(filename);
-        if(!file.isFile()) {
-            Log.warning("File " + filename + " does not exist");
-            return false;
-        }
+        if(!file.isFile()) return false;
 
         // Add the filename to the list of loaded files, and then interpret it
         loadedFiles.add(filename);
         (new Interpreter(filename)).interpret();
-
         return true;
     }
 

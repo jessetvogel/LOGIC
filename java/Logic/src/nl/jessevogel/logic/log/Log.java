@@ -14,4 +14,7 @@ public class Log {
         System.out.println("[WARNING] " + message);
     }
 
+    public static void output(String message) {
+        System.out.println(message);
+    }
 }

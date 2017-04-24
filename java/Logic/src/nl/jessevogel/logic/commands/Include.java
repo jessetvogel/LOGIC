@@ -20,7 +20,10 @@ public class Include extends Command {
 
     public boolean execute() {
         // Load file
-        FileManager.loadFile(lexer.getInterpreter().getWorkingDirectory() + "/" + lexer.createString(startPositions[0], endPositions[0]));
+        String filename = lexer.getInterpreter().getWorkingDirectory() + "/" + lexer.createString(startPositions[0], endPositions[0]);
+        if(!FileManager.loadFile(filename)) {
+            lexer.getInterpreter().error(lexer.tokenAt(startPositions[0] - 2), "Unable to load file " + filename); // TODO: use better method to find correct token
+        }
         return true;
     }
 }

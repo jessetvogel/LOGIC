@@ -78,7 +78,7 @@ public class Scanner {
 
         // Set pointer to beginning, and return the first character
         pointer = 0;
-        line = 0;
+        line = 1;
         column = 0;
         currentChar = fileContents.charAt(pointer);
         return currentChar;

@@ -27,21 +27,18 @@ public abstract class Command {
     }
 
     public Command setArgument(int argument, int startPosition, int endPosition) {
-        // Check if argument falls into the correct range
-        if(argument < 0 || argument >= amountOfArguments) {
-            Log.warning("Command " + commandName + " requires " + amountOfArguments + " arguments, but tried to set argument " + (argument + 1));
-            return this;
-        }
+        // Check if argument falls into the correct range. If not, stop. The parser will give an error
+        if(argument < 0 || argument >= amountOfArguments) return this;
 
         // Check if lexer was already set
         if(lexer == null) {
-            Log.warning("Trying to add argument to Command, but Lexer was not yet specified");
+            Log.error("Trying to add argument to Command, but Lexer was not yet specified");
             return this;
         }
 
         // Check if startPosition and endPosition make sense
         if(startPosition > endPosition) {
-            Log.warning("Start position of argument given comes later then the end position");
+            Log.error("Start position of argument given comes later then the end position");
             return this;
         }
 
