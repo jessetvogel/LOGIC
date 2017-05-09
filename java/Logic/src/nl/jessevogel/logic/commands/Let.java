@@ -3,8 +3,6 @@ package nl.jessevogel.logic.commands;
 import nl.jessevogel.logic.basic.Referent;
 import nl.jessevogel.logic.basic.Scope;
 import nl.jessevogel.logic.basic.Sense;
-import nl.jessevogel.logic.basic.Type;
-import nl.jessevogel.logic.log.Log;
 
 public class Let extends Command {
 

@@ -1,7 +1,5 @@
 package nl.jessevogel.logic.expressions;
 
-import nl.jessevogel.logic.basic.Type;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

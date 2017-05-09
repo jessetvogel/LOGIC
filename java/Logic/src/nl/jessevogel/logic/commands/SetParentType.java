@@ -1,9 +1,5 @@
 package nl.jessevogel.logic.commands;
 
-import nl.jessevogel.logic.basic.Sense;
-import nl.jessevogel.logic.basic.Type;
-import nl.jessevogel.logic.log.Log;
-
 public class SetParentType extends Command {
 
     /*
@@ -36,7 +32,7 @@ public class SetParentType extends Command {
             return false;
         }
 
-        // Check if the child is not already a parent of the parent (then we create an vicious circle)
+        // Check if the child is not already a parent of the parent (then we createInstance an vicious circle)
         if(parentType.isOfType(childType)) {
             lexer.getInterpreter().error(lexer.tokenAt(startPositions[0] - 2), "Tried to set '" + parentTypeLabel + "' as parent of '" + childTypeLabel + "' while it is already its child"); // TODO: use better method to find correct token
             return false;

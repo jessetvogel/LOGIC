@@ -6,18 +6,24 @@ import java.util.HashMap;
 
 public class Relation {
 
-    public static Relation NOT; // TODO: not sure if this is even necessary? Maybe it is sufficient to just have a reference in the labels
-    public static Relation OR;
-    public static Relation AND;
-
     private static final HashMap<String, Relation> labels = new HashMap<>();
 
     private String label;
-    private final Type type;
+    private Sense type; // TODO: Try to make this final again
     public final int amountOfDependencies;
-    public final Type[] dependenciesType;
+    public final Sense[] dependenciesType;
 
-    public Relation(Type type, Type[] dependenciesType) {
+    public Relation(Sense type, Sense[] dependenciesType) {
+        // Make sure that 'type' is a type
+        if(type.relation.getType() != Constant.TYPE_TYPE) {
+            Log.warning("Tried to createInstance a Relation but the provided Sense is not a type");
+            this.type = null;
+            this.amountOfDependencies = 0;
+            this.dependenciesType = null;
+            return;
+        }
+
+        // Store all data
         this.type = type;
         this.amountOfDependencies = (dependenciesType == null ? 0 : dependenciesType.length);
         this.dependenciesType = dependenciesType;
@@ -42,12 +48,22 @@ public class Relation {
         return this;
     }
 
-    public Type getType() {
+    public Sense getType() {
         // Return type
         return type;
     }
 
     public static boolean exists(String label) {
         return labels.containsKey(label);
+    }
+
+    public void setType(Sense type) {
+        // The ONLY TIME this may be used is when we pass Constant.TYPE_TYPE
+        if(type != Constant.TYPE_TYPE) {
+            Log.warning("Relation.setType was called, while it may only be used for Constant.TYPE_TYPE");
+            return;
+        }
+
+        this.type = type;
     }
 }

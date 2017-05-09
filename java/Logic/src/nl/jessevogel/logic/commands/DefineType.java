@@ -3,8 +3,6 @@ package nl.jessevogel.logic.commands;
 import nl.jessevogel.logic.basic.Scope;
 import nl.jessevogel.logic.basic.Sense;
 import nl.jessevogel.logic.basic.Relation;
-import nl.jessevogel.logic.basic.Type;
-import nl.jessevogel.logic.log.Log;
 
 import java.util.regex.Pattern;
 
@@ -40,7 +38,7 @@ public class DefineType extends Command {
             return false;
         }
 
-        // Define a new Type and create a corresponding Relation
+        // Define a new Type and createInstance a corresponding Relation
         // Also, everything is by default an Object
         Type type = new Type();
         type

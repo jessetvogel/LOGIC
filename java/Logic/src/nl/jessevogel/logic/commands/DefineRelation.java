@@ -1,10 +1,7 @@
 package nl.jessevogel.logic.commands;
 
 import nl.jessevogel.logic.basic.Relation;
-import nl.jessevogel.logic.basic.Sense;
-import nl.jessevogel.logic.basic.Type;
 import nl.jessevogel.logic.interpreter.Token;
-import nl.jessevogel.logic.log.Log;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;
