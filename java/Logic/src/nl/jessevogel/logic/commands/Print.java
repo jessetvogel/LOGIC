@@ -1,23 +1,24 @@
 package nl.jessevogel.logic.commands;
 
 import nl.jessevogel.logic.interpreter.FileManager;
+import nl.jessevogel.logic.log.Log;
 
-public class Include extends Command {
+public class Print extends Command {
 
     /*
         Syntax:
-            Include[filename]
+            Print[message]
      */
 
-    private static final String COMMAND_NAME = "Include";
+    private static final String COMMAND_NAME = "Print";
 
     private int argumentCounter;
-    private String filename;
+    private String message;
     private int firstTokenPosition;
 
     private boolean error;
 
-    Include() {
+    Print() {
         // Set values belonging to this command
         commandName = COMMAND_NAME;
 
@@ -29,7 +30,7 @@ public class Include extends Command {
     void interpretArgument(int startPosition, int endPosition) {
         switch(argumentCounter) {
             case 0:
-                setFilename(startPosition, endPosition);
+                setMessage(startPosition, endPosition);
                 break;
 
             default:
@@ -42,20 +43,17 @@ public class Include extends Command {
         argumentCounter ++;
     }
 
-    private void setFilename(int startPosition, int endPosition) {
+    private void setMessage(int startPosition, int endPosition) {
         // Determine filename and set firstTokenPosition
-        filename = lexer.getInterpreter().getWorkingDirectory() + "/" + lexer.createString(startPosition, endPosition);
-        firstTokenPosition = startPosition;
+        message = lexer.createString(startPosition, endPosition);
     }
 
     public boolean execute() {
-        if(error || filename == null)
+        if(error || message == null)
             return false; // TODO: ?
 
-        // Load file
-        if(!FileManager.loadFile(filename)) {
-            lexer.getInterpreter().error(lexer.tokenAt(firstTokenPosition), "Unable to load file " + filename);
-        }
+        // Print message
+        Log.output(message);
         return true;
     }
 }

@@ -8,9 +8,7 @@ public class Main {
     public static void main(String[] args) {
 
         // Create standard types
-        Constant.RELATION_TYPE_TYPE = (new Relation(null, null)).setLabel("Type");
-        Constant.TYPE_TYPE = new Sense(Constant.RELATION_TYPE_TYPE, null);
-        Constant.RELATION_TYPE_TYPE.setType(Constant.TYPE_TYPE); // TODO: find a better way to do this. However, we must do it in some ugly way, as both final things depend on each other..
+        Constant.RELATION_TYPE_TYPE = (new Relation(null, null)).setLabel("Type"); // Note: this also sets Constant.TYPE_TYPE (see Relation.java)
 
         Constant.RELATION_TYPE_OBJECT = (new Relation(Constant.TYPE_TYPE, null)).setLabel("Object");
         Constant.TYPE_OBJECT = new Sense(Constant.RELATION_TYPE_OBJECT, null);
@@ -25,7 +23,7 @@ public class Main {
         Constant.RELATION_TYPE = new Relation(Constant.TYPE_TYPE, new Sense[] { Constant.TYPE_IDENTIFIER });
         Constant.RELATION_OBJECT = new Relation(Constant.TYPE_OBJECT, new Sense[] { Constant.TYPE_IDENTIFIER });
         Constant.RELATION_PROPOSITION = new Relation(Constant.TYPE_PROPOSITION, new Sense[] { Constant.TYPE_IDENTIFIER });
-        Constant.RELATION_IDENTIFIER = new Relation(Constant.TYPE_IDENTIFIER, new Sense[] { Constant.TYPE_IDENTIFIER });
+        Constant.RELATION_IDENTIFIER = new Relation(Constant.TYPE_IDENTIFIER, null);
 
         // TODO: TYPE_TYPE and TYPE_PROPOSITION are children of TYPE_OBJECT, or: all TYPE_TYPE's and TYPE_PROPOSITION's are TYPE_OBJECT's
 

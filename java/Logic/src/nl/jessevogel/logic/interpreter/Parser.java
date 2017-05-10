@@ -7,17 +7,15 @@ import java.util.ArrayList;
 
 public class Parser {
 
-    public static final char CHARACTER_START_ARGUMENT = '[';
-    public static final char CHARACTER_END_ARGUMENT = ']';
+    private static final char CHARACTER_START_ARGUMENT = '[';
+    private static final char CHARACTER_END_ARGUMENT = ']';
 
     private Interpreter interpreter;
     private final Lexer lexer;
     private ArrayList<Command> commands;
     private Token currentToken;
 
-    private int amountOfCommands;
-
-    public Parser(String filename) {
+    Parser(String filename) {
         // Setup for parsing
         lexer = new Lexer(filename);
     }
@@ -32,7 +30,7 @@ public class Parser {
         lexer.setInterpreter(interpreter);
     }
 
-    public void parse() {
+    void parse() {
         // Analyze with the lexer!
         lexer.analyze();
 
@@ -44,12 +42,9 @@ public class Parser {
             // Add it to the list
             commands.add(command);
         }
-
-        // Count how many commands there are
-        amountOfCommands = commands.size();
     }
 
-    public Command readCommand() {
+    private Command readCommand() {
         // If we reached the end of the file, stop and return null
         if(lexer.reachedEnd()) return null;
 
@@ -67,15 +62,7 @@ public class Parser {
 
             // Read the arguments
             currentToken = lexer.nextToken();
-            int argument = 0;
-            while(readArgument(command, argument))
-                argument ++;
-
-            // If the number of arguments does not match, give a warning
-            if(argument != command.getAmountOfArguments()) {
-                interpreter.error(commandNameToken, "Command of type " + command.getCommandName() + " expects " + command.getAmountOfArguments() + " arguments, but " + argument + " were given");
-                return null;
-            }
+            while(readArgument(command));
 
             return command;
         }
@@ -85,7 +72,7 @@ public class Parser {
         return null;
     }
 
-    private boolean readArgument(Command command, int argument) {
+    private boolean readArgument(Command command) {
         // First Token should be a '[', if we don't find it, return false
         if(!(currentToken instanceof Token.CharToken)) return false;
         Token.CharToken cToken = (Token.CharToken) currentToken;
@@ -110,17 +97,12 @@ public class Parser {
         currentToken = lexer.nextToken();
 
         // Set the argument of the command, and return true
-        command.setArgument(argument, startPosition, endPosition);
+        command.addArgument(startPosition, endPosition);
         return true;
     }
 
-    public ArrayList<Command> getCommands() {
+    ArrayList<Command> getCommands() {
         // Return the list of commands
         return commands;
-    }
-
-    public Lexer getLexer() {
-        // Return the lexer
-        return lexer;
     }
 }

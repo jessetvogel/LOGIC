@@ -1,5 +1,7 @@
 package nl.jessevogel.logic.interpreter;
 
+import nl.jessevogel.logic.basic.Sense;
+
 public class Token {
 
     private int line;
@@ -40,6 +42,16 @@ public class Token {
         public StringToken(String str) {
             // Store string
             this.str = str;
+        }
+    }
+
+    public static class SenseToken extends Token {
+
+        public final Sense sense;
+
+        public SenseToken(Sense sense) {
+            // Store sense
+            this.sense = sense;
         }
     }
 }

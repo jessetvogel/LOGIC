@@ -20,6 +20,7 @@ public class Sense {
         int sensesLength = senses == null ? 0 : senses.length;
         if(sensesLength != relation.amountOfDependencies) {
             Log.warning("Unexpected number of dependencies given, expected " + relation.amountOfDependencies + ", but given " + sensesLength);
+            Thread.dumpStack();
             return;
         }
 

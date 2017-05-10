@@ -7,20 +7,27 @@ import java.util.HashMap;
 public class Relation {
 
     private static final HashMap<String, Relation> labels = new HashMap<>();
+    private static final HashMap<Sense, Relation> types = new HashMap<>();
 
     private String label;
-    private Sense type; // TODO: Try to make this final again
+    private final Sense type;
     public final int amountOfDependencies;
     public final Sense[] dependenciesType;
 
     public Relation(Sense type, Sense[] dependenciesType) {
-        // Make sure that 'type' is a type
-        if(type.relation.getType() != Constant.TYPE_TYPE) {
-            Log.warning("Tried to createInstance a Relation but the provided Sense is not a type");
-            this.type = null;
-            this.amountOfDependencies = 0;
-            this.dependenciesType = null;
-            return;
+        // TODO: there should be a better way to do this, but it works, so hey!
+        if(Constant.TYPE_TYPE == null) {
+            type = Constant.TYPE_TYPE = new Sense(this, null);
+        }
+        else {
+            // Make sure that 'type' is a type
+            if (type.relation.getType() != Constant.TYPE_TYPE) {
+                Log.warning("Tried to create a Relation but the provided Sense is not a type");
+                this.type = null;
+                this.amountOfDependencies = 0;
+                this.dependenciesType = null;
+                return;
+            }
         }
 
         // Store all data
@@ -57,13 +64,18 @@ public class Relation {
         return labels.containsKey(label);
     }
 
-    public void setType(Sense type) {
-        // The ONLY TIME this may be used is when we pass Constant.TYPE_TYPE
-        if(type != Constant.TYPE_TYPE) {
-            Log.warning("Relation.setType was called, while it may only be used for Constant.TYPE_TYPE");
-            return;
+    public static Relation fromType(Sense type) {
+        if(type.relation.getType() != Constant.TYPE_TYPE) { // TODO: note chould also be a child of TYPE_TYPE
+            Log.warning("Requested Relation related to a sense that is not a type");
+            return null;
         }
 
-        this.type = type;
+        Relation relation = types.get(type);
+        if(relation == null) {
+            // If not yet created, create a new one and put it in the map
+            relation = new Relation(type, new Sense[] { Constant.TYPE_IDENTIFIER });
+            types.put(type, relation);
+        }
+        return relation;
     }
 }

@@ -12,7 +12,7 @@ public class Lexer {
     private char currentChar;
 
     private static final Token TOKEN_IGNORE = new Token();
-    private static final String specialCharacters = "(){}[]<>.,_-+*/\\^";
+    private static final String specialCharacters = "(){}[]<>.,_-+*/\\^!?";
     private static final String wordCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     private int amountOfTokens;
@@ -161,6 +161,15 @@ public class Lexer {
                 sb.append(((Token.StringToken) token).str);
         }
         return sb.toString();
+    }
+
+    public ArrayList<Token> createArray(int startPosition, int endPosition) {
+        // Create an array of tokens between start and end position
+        ArrayList<Token> array = new ArrayList<>();
+        for (int i = startPosition; i < endPosition; i++)
+            array.add(tokens.get(i));
+
+        return array;
     }
 
     public Token tokenAt(int position) {

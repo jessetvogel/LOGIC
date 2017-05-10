@@ -1,38 +1,15 @@
 package nl.jessevogel.logic.expressions;
 
+import nl.jessevogel.logic.interpreter.Token;
+
 import java.util.ArrayList;
 
 public class Expression {
 
-    public ArrayList<Term> terms;
+    private final Token[] tokens;
 
-    public Expression() {
-        // Create new list of terms
-        terms = new ArrayList<>();
+    public Expression(ArrayList<Token> tokens) {
+        // Create an array out of the passed ArrayList
+        this.tokens = tokens.toArray(new Token[tokens.size()]);
     }
-
-    public void addTerm(Term term) {
-        terms.add(term);
-    }
-
-    public static class Term {
-
-    }
-
-    public static class TypeTerm extends Term {
-        public Type type;
-
-        public TypeTerm(Type type) {
-            this.type = type;
-        }
-    }
-
-    public static class StringTerm extends Term {
-        public String string;
-
-        public StringTerm(String string) {
-            this.string = string;
-        }
-    }
-
 }

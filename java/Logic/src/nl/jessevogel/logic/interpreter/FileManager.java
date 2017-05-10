@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class FileManager {
 
-    private static String rootFile = "/Users/jessetvogel/Documents/logic/main.math";
+    private static String rootFile = "/Users/Jesse/Documents/logic/main.math";
 
     public static ArrayList<String> loadedFiles = new ArrayList<>();
 

@@ -25,7 +25,7 @@ public class Interpreter {
 
         // Execute all commands
         for(Command command : parser.getCommands())
-            command.execute();
+            command.execute(); // TODO: do something based on whether the command was successfully executed
     }
 
     public String getWorkingDirectory() {
@@ -34,13 +34,13 @@ public class Interpreter {
     }
 
     public void error(Token token, String message) {
-        Log.output("Error in " + filename + " at line " + token.getLine() + " at position " + token.getColumn() + ":");
+        Log.output("Error in " + filename + " at line " + token.getLine() + " at position " + (token.getColumn() + 1) + ":");
         Log.output("\t " + message);
         Log.output("");
     }
 
     public void error(int line, int column, String message) {
-        Log.output("Error in " + filename + " at line " + line + " at position " + column + ":");
+        Log.output("Error in " + filename + " at line " + line + " at position " + (column + 1) + ":");
         Log.output("\t " + message);
         Log.output("");
     }
