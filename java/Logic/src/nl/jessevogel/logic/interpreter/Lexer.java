@@ -32,15 +32,15 @@ public class Lexer {
         this.interpreter = interpreter;
     }
 
-    public void analyze() {
+    public boolean analyze() {
         if(tokens != null) {
             // If already scanned, give a warning and stop
             Log.warning("Lexer.analyze() called while already analyzed");
-            return;
+            return false;
         }
 
         // Scan with the scanner!
-        scanner.scan();
+        if(!scanner.scan()) return false;
 
         // Group characters to tokens
         tokens = new ArrayList<>();
@@ -53,9 +53,11 @@ public class Lexer {
             // Otherwise, add it to the list of tokens
             tokens.add(token);
         }
+        if(!scanner.reachedEnd()) return false;
 
         // Count how many tokens there are
         amountOfTokens = tokens.size();
+        return true;
     }
 
     private Token readToken() {
@@ -75,7 +77,7 @@ public class Lexer {
         if (currentChar == '#' && scanner.getColumn() == 0) {
             int currentLine = scanner.getLine();
             currentChar = scanner.nextCharacter();
-            while(scanner.getLine() == currentLine)
+            while(!scanner.reachedEnd() && scanner.getLine() == currentLine)
                 currentChar = scanner.nextCharacter();
 
             return TOKEN_IGNORE;

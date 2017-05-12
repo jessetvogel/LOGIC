@@ -7,12 +7,12 @@ import java.util.Set;
 
 public class Sense {
 
-    public static Set<Sense> senses = new HashSet<>(); // TODO : ?
+    public static Set<Sense> sensesSet = new HashSet<>(); // TODO : ?
 
-    public Relation relation;
-    public Sense[] dependencies;
+    public final Relation relation;
+    public final Sense[] dependencies;
 
-    public Sense(Relation relation, Sense[] senses) {
+    private Sense(Relation relation, Sense[] senses) {
         // Store the Relation
         this.relation = relation;
 
@@ -21,6 +21,7 @@ public class Sense {
         if(sensesLength != relation.amountOfDependencies) {
             Log.warning("Unexpected number of dependencies given, expected " + relation.amountOfDependencies + ", but given " + sensesLength);
             Thread.dumpStack();
+            dependencies = null;
             return;
         }
 
@@ -35,7 +36,31 @@ public class Sense {
 //                }
                 dependencies[i] = senses[i];
             }
+        } else {
+            dependencies = null;
         }
     }
 
+    public static Sense createUnique(Relation relation, Sense[] senses) {
+        return new Sense(relation, senses);
+    }
+
+    public static Sense create(Relation relation, Sense[] senses) {
+        // Check if there is already some Sense which has the form that we would like TODO: this can probably be optimized much much MUCH more
+        for(Sense sense : sensesSet) {
+            if(sense.relation == relation) {
+                int i;
+                for(i = 0;i < relation.amountOfDependencies;i ++)
+                    if(sense.dependencies[i] != senses[i]) break;
+
+                // If it is a complete match, just return this sense
+                if(i == relation.amountOfDependencies) return sense;
+            }
+        }
+
+        // If we were not able to find it, create a new one
+        Sense sense = new Sense(relation, senses);
+        sensesSet.add(sense);
+        return sense;
+    }
 }

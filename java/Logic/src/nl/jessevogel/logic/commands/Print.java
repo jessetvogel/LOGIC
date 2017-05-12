@@ -14,7 +14,6 @@ public class Print extends Command {
 
     private int argumentCounter;
     private String message;
-    private int firstTokenPosition;
 
     private boolean error;
 
@@ -49,8 +48,13 @@ public class Print extends Command {
     }
 
     public boolean execute() {
-        if(error || message == null)
-            return false; // TODO: ?
+        if(error)
+            return false;
+
+        if(message == null) {
+            lexer.getInterpreter().error(firstToken, "One argument expected");
+            return false;
+        }
 
         // Print message
         Log.output(message);

@@ -1,12 +1,13 @@
 package nl.jessevogel.logic.basic;
 
+import nl.jessevogel.logic.expressions.LabelSet;
 import nl.jessevogel.logic.log.Log;
 
 import java.util.HashMap;
 
 public class Relation {
 
-    private static final HashMap<String, Relation> labels = new HashMap<>();
+    private static final LabelSet<Relation> labelSet = new LabelSet<>();
     private static final HashMap<Sense, Relation> types = new HashMap<>();
 
     private String label;
@@ -17,7 +18,7 @@ public class Relation {
     public Relation(Sense type, Sense[] dependenciesType) {
         // TODO: there should be a better way to do this, but it works, so hey!
         if(Constant.TYPE_TYPE == null) {
-            type = Constant.TYPE_TYPE = new Sense(this, null);
+            type = Constant.TYPE_TYPE = Sense.create(this, null);
         }
         else {
             // Make sure that 'type' is a type
@@ -43,16 +44,15 @@ public class Relation {
             return this;
         }
 
-        // Check if the label is already used
-        if(labels.containsKey(label)) {
-            Log.warning("Label '" + label + "' is already used");
-            return this;
-        }
+        // Try to set the label
+        if(labelSet.put(label, this))
+            this.label = label;
 
-        // Set label, and add it to the HashMap
-        this.label = label;
-        labels.put(label, this);
         return this;
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     public Sense getType() {
@@ -61,10 +61,10 @@ public class Relation {
     }
 
     public static boolean exists(String label) {
-        return labels.containsKey(label);
+        return labelSet.isSet(label);
     }
 
-    public static Relation fromType(Sense type) {
+    public static Relation instanceRelation(Sense type) {
         if(type.relation.getType() != Constant.TYPE_TYPE) { // TODO: note chould also be a child of TYPE_TYPE
             Log.warning("Requested Relation related to a sense that is not a type");
             return null;
@@ -73,7 +73,7 @@ public class Relation {
         Relation relation = types.get(type);
         if(relation == null) {
             // If not yet created, create a new one and put it in the map
-            relation = new Relation(type, new Sense[] { Constant.TYPE_IDENTIFIER });
+            relation = new Relation(type, null);
             types.put(type, relation);
         }
         return relation;

@@ -1,19 +1,30 @@
 package nl.jessevogel.logic.commands;
 
-import nl.jessevogel.logic.expressions.Expression;
+import nl.jessevogel.logic.basic.Relation;
+import nl.jessevogel.logic.basic.Scope;
+import nl.jessevogel.logic.basic.Sense;
+import nl.jessevogel.logic.expressions.*;
+import nl.jessevogel.logic.interpreter.Token;
+
+import java.util.ArrayList;
 
 public class Notation extends Command {
 
     /*
         Syntax:
-            Notation[Expression new][Expression old]
+            Notation[expression][sense][type 1][label 1] ... [type n][label n]
+
+        Example:
+            Notation[x in A][In(x, A)][Object][x][Set][A]
      */
 
     private static final String COMMAND_NAME = "Notation";
 
     private int argumentCounter;
-    private Expression expressionNew;
-    private Expression expressionOld;
+    private ArrayList<Token> arrayExpression;
+    private ArrayList<Token> arraySense;
+    private Sense type;
+    private LabelSet<Sense> labelSet;
 
     private boolean error;
 
@@ -24,21 +35,39 @@ public class Notation extends Command {
         // Set other values
         argumentCounter = 0;
         error = false;
+
+        // By default, use the LabelSet of the main scope. If more placeholders are used, a new LabelSet will be created
+        labelSet = Scope.main.labelSenses;
     }
 
     void interpretArgument(int startPosition, int endPosition) {
         switch(argumentCounter) {
             case 0:
-                setExpressionNew(startPosition, endPosition);
+                arrayExpression = lexer.createArray(startPosition, endPosition);
                 break;
 
             case 1:
-                setExpressionOld(startPosition, endPosition);
+                arraySense = lexer.createArray(startPosition, endPosition);
                 break;
 
             default:
-                lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Only two arguments expected");
-                error = true;
+                if(argumentCounter % 2 == 0) {
+                    // Get type
+                    type = (new ExpressionParser(lexer.createArray(startPosition, endPosition))).parse();
+
+                    // TODO: check if it even is a type
+                }
+                else {
+                    // Get label
+                    String label = lexer.createString(startPosition, endPosition); // TODO: check if valid label, i.e. alphanumeric
+
+                    // Replace the labelSet if still the default is used
+                    if(labelSet == Scope.main.labelSenses)
+                        labelSet = new LabelSet<Sense>().addParent(Scope.main.labelSenses);
+
+                    // Add it to the labelSet
+                    labelSet.put(label, Placeholder.create(type));
+                }
                 break;
         }
 
@@ -47,21 +76,29 @@ public class Notation extends Command {
     }
 
     public boolean execute() {
-        if(error || expressionNew == null || expressionOld == null)
-            return false; // TODO: maybe give an error message?
+        // Check for errors
+        if (error)
+            return false;
 
-        // TODO
+        if (arrayExpression == null || arraySense == null) {
+            lexer.getInterpreter().error(lexer.tokenAt(0), "Command Notation requires at least two arguments"); // TODO: pass correct token
+            return false;
+        }
+
+        if(argumentCounter % 2 != 0) {
+            lexer.getInterpreter().error(lexer.tokenAt(0), "Command Notation expected label but none passed"); // TODO: pass correct token
+            return false;
+        }
+
+        // Substitute all tokens
+        labelSet.substituteTokens(arrayExpression);
+        labelSet.substituteTokens(arraySense);
+
+        // Create a new rule
+        Expression expression = new Expression(arrayExpression);
+        Sense sense = (new ExpressionParser(arraySense)).parse();
+        Rule.addRule(expression, sense);
 
         return true;
-    }
-
-    private void setExpressionNew(int startPosition, int endPosition) {
-        // Create a new expression from the tokens
-        expressionNew = new Expression(lexer.createArray(startPosition, endPosition));
-    }
-
-    private void setExpressionOld(int startPosition, int endPosition) {
-        // Create an expression from the tokens
-        expressionOld = new Expression(lexer.createArray(startPosition, endPosition));
     }
 }

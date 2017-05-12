@@ -30,9 +30,9 @@ public class Parser {
         lexer.setInterpreter(interpreter);
     }
 
-    void parse() {
+    boolean parse() {
         // Analyze with the lexer!
-        lexer.analyze();
+        if(!lexer.analyze()) return false;
 
         // Create a new list of commands
         commands = new ArrayList<>();
@@ -40,8 +40,10 @@ public class Parser {
         Command command;
         while((command = readCommand()) != null) {
             // Add it to the list
-            commands.add(command);
+            if(!command.execute()) return false;
         }
+
+        return lexer.reachedEnd();
     }
 
     private Command readCommand() {
@@ -58,7 +60,9 @@ public class Parser {
             }
 
             // Set the lexer of the command
-            command.setLexer(lexer);
+            command
+                    .setLexer(lexer)
+                    .setFirstToken(commandNameToken);
 
             // Read the arguments
             currentToken = lexer.nextToken();

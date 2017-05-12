@@ -1,5 +1,6 @@
 package nl.jessevogel.logic.basic;
 
+import nl.jessevogel.logic.expressions.LabelSet;
 import nl.jessevogel.logic.log.Log;
 
 import java.util.HashMap;
@@ -8,23 +9,18 @@ public class Scope {
 
     public static Scope main;
 
-    public HashMap<String, Sense> labels;
+    public LabelSet<Sense> labelSenses;
     public HashMap<Sense, Referent> referents;
 
     public Scope() {
         // Create a map for the senses
         referents = new HashMap<>();
-        labels = new HashMap<>();
+        labelSenses = new LabelSet<>();
     }
 
     public void nameSense(String label, Sense sense) {
-        // Check if the label was already used
-        if(labels.containsKey(label)) {
-            Log.error("The label '" + label + "' is already used");
-            return;
-        }
-
-        labels.put(label, sense);
+        // Try to associate the label with the sense
+        labelSenses.put(label, sense);
     }
 
     public void map(Sense sense, Referent referent) {

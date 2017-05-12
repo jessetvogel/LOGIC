@@ -1,16 +1,25 @@
 package nl.jessevogel.logic.commands;
 
 import nl.jessevogel.logic.interpreter.Lexer;
+import nl.jessevogel.logic.interpreter.Token;
 import nl.jessevogel.logic.log.Log;
 
 public abstract class Command {
 
     String commandName;
     Lexer lexer;
+    protected Token firstToken;
 
-    public void setLexer(Lexer lexer) {
+    public Command setLexer(Lexer lexer) {
         // Store lexer
         this.lexer = lexer;
+        return this;
+    }
+
+    public Command setFirstToken(Token firstToken) {
+        // Store firstToken
+        this.firstToken = firstToken;
+        return this;
     }
 
     public Command addArgument(int startPosition, int endPosition) {

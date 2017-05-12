@@ -12,7 +12,7 @@ public class Scanner {
     private final String filename;
     private String fileContents;
     private int fileLength;
-    private static final char CHARACTER_NEWLINE = '\n';
+    public static final char CHARACTER_NEWLINE = '\n';
 
     private int pointer, line, column;
     private char currentChar;
@@ -22,11 +22,11 @@ public class Scanner {
         this.filename = filename;
     }
 
-    public void scan() {
+    public boolean scan() {
         if(fileContents != null) {
             // If already scanned, give a warning and stop
             Log.warning("Scanner.scan() called while already scanned");
-            return;
+            return false;
         }
 
         try {
@@ -47,10 +47,12 @@ public class Scanner {
 
             // Close file
             br.close();
+            return true;
         }
         catch(IOException e) {
             // TODO: maybe we must do something here
             e.printStackTrace();
+            return false;
         }
     }
 

@@ -19,13 +19,9 @@ public class Interpreter {
         workingDirectory = (new File(filename)).getParent();
     }
 
-    public void interpret() {
+    public boolean interpret() {
         // Parse with the parser!
-        parser.parse();
-
-        // Execute all commands
-        for(Command command : parser.getCommands())
-            command.execute(); // TODO: do something based on whether the command was successfully executed
+        return parser.parse();
     }
 
     public String getWorkingDirectory() {

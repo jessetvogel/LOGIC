@@ -2,7 +2,9 @@ package nl.jessevogel.logic.commands;
 
 import nl.jessevogel.logic.basic.*;
 import nl.jessevogel.logic.expressions.ExpressionParser;
+import nl.jessevogel.logic.interpreter.Token;
 
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class Let extends Command {
@@ -55,13 +57,13 @@ public class Let extends Command {
             return false; // TODO: ?
 
         // Create a sense
-        Sense sense = new Sense(Relation.fromType(type), new Sense[] { Identifier.createInstance() });
+        Sense sense = Instance.create(type);
 
         // Map the sense to a new referent
         Scope.main.map(sense, Referent.createInstance());
 
         // Map label to this sense
-        Scope.main.labels.put(label, sense);
+        Scope.main.labelSenses.put(label, sense);
 
         return true;
     }
@@ -75,7 +77,11 @@ public class Let extends Command {
             return;
         }
 
-        // TODO: check if the label is free to use
+        if(Scope.main.labelSenses.isSet(label)) {
+            lexer.getInterpreter().error(lexer.tokenAt(startPosition),"The label '" + label + "' was already used");
+            error = true;
+            return;
+        }
 
         // Store the label
         this.label = label;
@@ -83,7 +89,7 @@ public class Let extends Command {
 
     private void setType(int startPosition, int endPosition) {
         // Find the type of the relation, and check if it exists
-        Sense type = (new ExpressionParser(lexer.createArray(startPosition, endPosition))).parse();
+        Sense type = (new ExpressionParser(Scope.main.labelSenses.substituteTokens(lexer.createArray(startPosition, endPosition)))).parse();
         if(type == null) {
             lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Was not able to parse the provided argument");
             error = true;
