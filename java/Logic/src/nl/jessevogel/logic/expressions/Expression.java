@@ -26,11 +26,11 @@ public class Expression {
     }
 
     public int find(ArrayList<Token> listToken, Map<Sense, Sense> placeholders) {
-        placeholders.clear(); // TODO: when should we clear this even? I guess it doesn't even need to be cleared, but maybe just for performance?
         int size = listToken.size();
         int maxStartingIndex = size - tokens.length;
 
         for(int startingIndex = 0; startingIndex <= maxStartingIndex; startingIndex ++) { // TODO: format all for-loops equally
+            placeholders.clear();
             int i;
             for(i = 0;i < tokens.length;i ++) {
                 Token token1 = tokens[i];
@@ -57,11 +57,15 @@ public class Expression {
                                             return -1;
                                         }
 
-                    // TODO: account for children of the type
-                    if(sense2.relation.getType() == sense1.relation.getType()) {
-                        placeholders.put(sense1, sense2);
-                        continue;
-                    } else break;
+                    // If the two senses are of different types TODO: account for children of the type
+                    if(sense2.relation.getType() != sense1.relation.getType()) break;
+
+                    // In case the placeholder is already referring to something, but something else
+                    if(placeholders.containsKey(sense1) && placeholders.get(sense1) != sense2) break;
+
+                    // Otherwise, it is a match
+                    placeholders.put(sense1, sense2);
+                    continue;
                 }
 
                 // If none of the above triggered, then there is no match
@@ -90,8 +94,13 @@ public class Expression {
             if(token instanceof Token.StringToken)
                 System.out.print(((Token.StringToken) token).str);
 
-            if(token instanceof Token.SenseToken)
-                System.out.print(((Token.SenseToken) token).sense.relation.getLabel());
+            if(token instanceof Token.SenseToken) {
+                Sense sense = ((Token.SenseToken) token).sense;
+                if(Placeholder.is(sense))
+                    System.out.print("<" + sense.relation.getType().relation.getLabel() + ">");
+                else
+                    System.out.print(sense.relation.getLabel());
+            }
         }
 
         System.out.println();

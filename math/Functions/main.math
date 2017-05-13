@@ -1,0 +1,6 @@
+Define[Function][Type]
+
+Define[Domain][Set][Function][~]
+Define[Range][Set][Function][~]
+
+Define[Evaluate][Element(Range(f))][Function][f][Element(Domain(f))][~]

@@ -5,7 +5,9 @@ import nl.jessevogel.logic.basic.Relation;
 import nl.jessevogel.logic.basic.Scope;
 import nl.jessevogel.logic.basic.Sense;
 import nl.jessevogel.logic.expressions.*;
+import nl.jessevogel.logic.expressions.Label;
 import nl.jessevogel.logic.interpreter.Token;
+import nl.jessevogel.logic.log.Log;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -18,17 +20,18 @@ public class Define extends Command {
      */
 
     private static final String COMMAND_NAME = "Define";
-    private static final Pattern patternRelationName = Pattern.compile("^[A-Za-z0-9]+$");
     private static final char CHARACTER_START_ARGUMENTS = '(';
     private static final char CHARACTER_END_ARGUMENTS = ')';
     private static final char CHARACTER_ARGUMENTS_SEPARATOR = ',';
+    private static final char CHARACTER_NO_LABEL = '~';
 
     private int argumentCounter;
     private String label;
-    private Sense type;
-    private ArrayList<Sense> dependencies;
+    private ArrayList<Token> typeTokens;
+    private ArrayList<Sense> dependencyPlaceholders;
+    private ArrayList<Sense> dependencyTypes;
     private LabelSet<Sense> labelSet;
-    private Sense dependency;
+    private Sense lastDependencyType;
 
     private boolean error;
 
@@ -45,6 +48,8 @@ public class Define extends Command {
     }
 
     void interpretArgument(int startPosition, int endPosition) {
+        if(error) return;
+
         switch(argumentCounter) {
             case 0:
                 setLabel(startPosition, endPosition);
@@ -58,7 +63,7 @@ public class Define extends Command {
                 if(argumentCounter % 2 == 0)
                     addDependency(startPosition, endPosition);
                 else
-                    labelLastDependency(startPosition, endPosition);
+                    labelDependency(startPosition, endPosition);
 
                 break;
         }
@@ -69,23 +74,43 @@ public class Define extends Command {
 
     public boolean execute() {
         if(error)
-            return false; // TODO: maybe give an error message?
+            return false;
 
+        if(argumentCounter % 2 != 0) {
+            lexer.getInterpreter().error(firstToken, "Expected a label for given type");
+            return false;
+        }
+
+        // Prepare to define a new Relation
         int amountOfDependencies;
+        Sense[] placeholders;
         Sense[] types;
-
-        // Create a new array from the ArrayList
-        if(dependencies == null) {
+        if(dependencyTypes == null) {
             amountOfDependencies = 0;
+            placeholders = null;
             types = null;
         }
         else {
-            amountOfDependencies = dependencies == null ? 0 : dependencies.size();
-            types = dependencies.toArray(new Sense[amountOfDependencies]);
+            amountOfDependencies = dependencyTypes.size();
+            placeholders = dependencyPlaceholders.toArray(new Sense[amountOfDependencies]);
+            types = dependencyTypes.toArray(new Sense[amountOfDependencies]);
+        }
+
+        // Determine the type at last, because it may refer to some of the arguments
+        Sense type = (new ExpressionParser(labelSet.substituteTokens(typeTokens))).parse();
+        if(type == null) {
+            lexer.getInterpreter().error(typeTokens.get(0), "Was not able to parse the provided argument");
+            return false;
+        }
+
+        // Check if the parsed Sense is actually a type
+        if(type.relation.getType() != Constant.TYPE_TYPE) {
+            lexer.getInterpreter().error(typeTokens.get(0), "Expected a type");
+            return false;
         }
 
         // Create the relation and give it a label
-        Relation relation = (new Relation(type, types))
+        Relation relation = (new Relation(type, placeholders, types))
                 .setLabel(label);
 
         /* Automatically create a rule for this expression of the form:
@@ -94,18 +119,14 @@ public class Define extends Command {
          *
          */
 
-        // TODO: create a separate method for this
-        Sense[] placeholders = new Sense[amountOfDependencies];
-        for(int i = 0; i < amountOfDependencies; i ++)
-            placeholders[i] = Placeholder.create(types[i]);
-
+        // TODO: create a separate method for this, somewhere in some Expression type of class
         ArrayList<Token> tokens = new ArrayList<>();
         tokens.add(new Token.StringToken(label));
 
         if(amountOfDependencies > 0) {
             tokens.add(new Token.CharToken(CHARACTER_START_ARGUMENTS));
 
-            for (int i = 0; i < amountOfDependencies; i++) {
+            for(int i = 0; i < amountOfDependencies; i++) {
                 tokens.add(new Token.SenseToken(placeholders[i]));
                 if (i < amountOfDependencies - 1)
                     tokens.add(new Token.CharToken(CHARACTER_ARGUMENTS_SEPARATOR));
@@ -115,7 +136,6 @@ public class Define extends Command {
         }
 
         Expression expression = new Expression(tokens);
-
         Sense sense = Sense.create(relation, placeholders);
         Rule.addRule(expression, sense);
         return true;
@@ -124,7 +144,7 @@ public class Define extends Command {
     private void setLabel(int startPosition, int endPosition) {
         // Check if the label has the correct type name pattern
         String label = lexer.createString(startPosition, endPosition);
-        if(!patternRelationName.matcher(label).find()) {
+        if(!Label.valid(label)) {
             lexer.getInterpreter().error(lexer.tokenAt(startPosition),"Relation label may only contain alphanumerical characters");
             error = true;
             return;
@@ -143,53 +163,48 @@ public class Define extends Command {
 
     private void setType(int startPosition, int endPosition) {
         // Find the type of the relation, and check if it exists
-        Sense type = (new ExpressionParser(lexer.createArray(startPosition, endPosition))).parse();
-        if(type == null) {
-            lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Was not able to parse the provided argument");
-            error = true;
-            return;
-        }
-
-        // Check if the parsed Sense is actually a type
-        if(type.relation.getType() != Constant.TYPE_TYPE) {
-            lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Expected a type");
-            error = true;
-            return;
-        }
-
-        // Store the type
-        this.type = type;
+        typeTokens = lexer.createArray(startPosition, endPosition);
     }
 
     private void addDependency(int startPosition, int endPosition) {
         // Parse the sense
-        dependency = (new ExpressionParser(lexer.createArray(startPosition, endPosition))).parse();
-        if(dependency == null) {
+        lastDependencyType = (new ExpressionParser(labelSet.substituteTokens(lexer.createArray(startPosition, endPosition)))).parse();
+        if(lastDependencyType == null) {
             lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Was not able to parse the provided argument");
             error = true;
             return;
         }
 
         // Check if the parsed Sense is actually a type
-        if(dependency.relation.getType() != Constant.TYPE_TYPE) { // TODO: or a child of TYPE_TYPE
+        if(lastDependencyType.relation.getType() != Constant.TYPE_TYPE) { // TODO: or a child of TYPE_TYPE
             lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Expected a type");
             error = true;
             return;
         }
 
         // Add the type to the list of dependencies
-        if(dependencies == null)
-            dependencies = new ArrayList<>();
-        dependencies.add(dependency);
+        if(dependencyTypes == null) {
+            dependencyTypes = new ArrayList<>();
+            dependencyPlaceholders = new ArrayList<>();
+        }
+        dependencyTypes.add(lastDependencyType);
     }
 
-    private void labelLastDependency(int startPosition, int endPosition) {
+    private void labelDependency(int startPosition, int endPosition) {
+        // Add a new placeholder to the list of placeholders
+        Sense placeholder = Placeholder.create(lastDependencyType);
+        dependencyPlaceholders.add(placeholder);
+
+        // Give the placeholder a label if asked for
         String label = lexer.createString(startPosition, endPosition);
+        if(label.length() == 1 && label.charAt(0) == CHARACTER_NO_LABEL) return;
+
         // TODO: check if valid label
 
+        // Create new LabelSet if not yet done
         if(labelSet == Scope.main.labelSenses)
             labelSet = new LabelSet<Sense>().addParent(Scope.main.labelSenses);
 
-//        labelSet.put(label, ~); Yeah?
+        labelSet.put(label, placeholder);
     }
 }

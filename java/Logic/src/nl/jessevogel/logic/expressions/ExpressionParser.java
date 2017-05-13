@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class ExpressionParser {
 
-    public static final Map<Sense, Sense> placeholders = new HashMap<>();
+    private static final Map<Sense, Sense> placeholders = new HashMap<>();
 
     private ArrayList<Token> tokens;
 

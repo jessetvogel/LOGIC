@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Sense {
 
-    public static Set<Sense> sensesSet = new HashSet<>(); // TODO : ?
+    private static Set<Sense> set = new HashSet<>();
 
     public final Relation relation;
     public final Sense[] dependencies;
@@ -47,7 +47,7 @@ public class Sense {
 
     public static Sense create(Relation relation, Sense[] senses) {
         // Check if there is already some Sense which has the form that we would like TODO: this can probably be optimized much much MUCH more
-        for(Sense sense : sensesSet) {
+        for(Sense sense : set) {
             if(sense.relation == relation) {
                 int i;
                 for(i = 0;i < relation.amountOfDependencies;i ++)
@@ -60,7 +60,7 @@ public class Sense {
 
         // If we were not able to find it, create a new one
         Sense sense = new Sense(relation, senses);
-        sensesSet.add(sense);
+        set.add(sense);
         return sense;
     }
 }

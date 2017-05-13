@@ -1,24 +1,25 @@
 package nl.jessevogel.logic.commands;
 
 import nl.jessevogel.logic.basic.*;
-import nl.jessevogel.logic.expressions.*;
+import nl.jessevogel.logic.expressions.ExpressionParser;
+import nl.jessevogel.logic.expressions.Label;
 
-public class Let extends Command {
+public class Call extends Command {
 
     /*
         Syntax:
-            Let[label][type]
+            Call[label][sense]
      */
 
-    private static final String COMMAND_NAME = "Let";
+    private static final String COMMAND_NAME = "Call";
 
     private int argumentCounter;
     private String label;
-    private Sense type;
+    private Sense sense;
 
     private boolean error;
 
-    Let() {
+    Call() {
         // Set values belonging to this command
         commandName = COMMAND_NAME;
 
@@ -36,7 +37,7 @@ public class Let extends Command {
                 break;
 
             case 1:
-                setType(startPosition, endPosition);
+                setSense(startPosition, endPosition);
                 break;
 
             default:
@@ -53,20 +54,13 @@ public class Let extends Command {
         if(error)
             return false;
 
-        if(label == null || type == null) {
+        if(label == null || sense == null) {
             lexer.getInterpreter().error(firstToken, "Missing arguments");
             return false;
         }
 
-        // Create a sense
-        Sense sense = Instance.create(type);
-
-        // Map the sense to a new referent
-        Scope.main.map(sense, Referent.createInstance());
-
         // Map label to this sense
         Scope.main.labelSenses.put(label, sense);
-
         return true;
     }
 
@@ -89,23 +83,16 @@ public class Let extends Command {
         this.label = label;
     }
 
-    private void setType(int startPosition, int endPosition) {
+    private void setSense(int startPosition, int endPosition) {
         // Find the type of the relation, and check if it exists
-        Sense type = (new ExpressionParser(Scope.main.labelSenses.substituteTokens(lexer.createArray(startPosition, endPosition)))).parse();
-        if(type == null) {
+        Sense sense = (new ExpressionParser(Scope.main.labelSenses.substituteTokens(lexer.createArray(startPosition, endPosition)))).parse();
+        if(sense == null) {
             lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Was not able to parse the provided argument");
             error = true;
             return;
         }
 
-        // Check if the parsed Sense is actually a type
-        if(type.relation.getType() != Constant.TYPE_TYPE) {
-            lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Expected a type");
-            error = true;
-            return;
-        }
-
         // Store the type
-        this.type = type;
+        this.sense = sense;
     }
 }

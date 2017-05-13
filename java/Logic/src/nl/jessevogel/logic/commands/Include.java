@@ -27,6 +27,8 @@ public class Include extends Command {
     }
 
     void interpretArgument(int startPosition, int endPosition) {
+        if(error) return;
+
         switch(argumentCounter) {
             case 0:
                 setFilename(startPosition, endPosition);

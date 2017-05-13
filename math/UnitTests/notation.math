@@ -1,0 +1,11 @@
+Notation[x foo x][x][Object][x]
+
+Let[a][Object]
+Let[b][Object]
+
+# This should be parsed
+Call[c][a foo a]
+
+# This should not be parsed, i.e. give an error
+Print[EXPECTED_ERROR]
+Call[d][a foo b]

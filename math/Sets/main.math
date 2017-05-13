@@ -1,0 +1,13 @@
+Define[Set][Type]
+
+Define[In][Proposition][Object][~][Set][~]
+Notation[x in A][In(x, A)][Object][x][Set][A]
+
+Define[Subset][Proposition][Set][~][Set][~]
+Notation[A subset B][Subset(A, B)][Set][A][Set][B]
+# A subset B iff x in A implies x in B
+
+# A = B iff A subset B and B subset A
+
+Define[Element][Type][Set][~]
+# x is Element(A) iff x in A

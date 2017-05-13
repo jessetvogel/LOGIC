@@ -12,7 +12,7 @@ public class Lexer {
     private char currentChar;
 
     private static final Token TOKEN_IGNORE = new Token();
-    private static final String specialCharacters = "(){}[]<>.,_-+*/\\^!?";
+    private static final String specialCharacters = "(){}[]<>.,_-+*/\\^!?~";
     private static final String wordCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     private int amountOfTokens;

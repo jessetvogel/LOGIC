@@ -14,25 +14,25 @@ public class Placeholder {
 
     public static Sense create(Sense type) {
         // Make sure the given sense is actually a type
-        if(type.relation.getType() != Constant.TYPE_TYPE) { // TODO: note chould also be a child of TYPE_TYPE
+        if(type.relation.getType() != Constant.TYPE_TYPE) { // TODO: note could also be a child of TYPE_TYPE
             Log.warning("Tried to create a Placeholder, but given sense is not a type");
             return null;
         }
 
         // If not yet a Relation was created, create a new one and put it in the map
         if(!relations.containsKey(type)) {
-            relations.put(type, new Relation(type, null));
+            relations.put(type, new Relation(type, null,null));
         }
 
         return Sense.createUnique(relations.get(type), null);
     }
 
-    public static Sense replace(Sense sense, Map<Sense, Sense> placeholders) {
+    static Sense replace(Sense sense, Map<Sense, Sense> placeholders) {
         // In case of a placeholder
         if(Placeholder.is(sense)) {
             Sense x = placeholders.get(sense);
             if(x == null)
-                Log.warning("Placeholder was not found!! :O :O "); // TODO: change the contents of this warning
+                Log.warning("Placeholder was not found!! :O :O "); // TODO: change the contents of this warning to something more serious
 
             return x;
         }

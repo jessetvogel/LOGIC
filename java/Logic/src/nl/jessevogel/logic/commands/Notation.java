@@ -1,6 +1,5 @@
 package nl.jessevogel.logic.commands;
 
-import nl.jessevogel.logic.basic.Relation;
 import nl.jessevogel.logic.basic.Scope;
 import nl.jessevogel.logic.basic.Sense;
 import nl.jessevogel.logic.expressions.*;
@@ -41,6 +40,8 @@ public class Notation extends Command {
     }
 
     void interpretArgument(int startPosition, int endPosition) {
+        if(error) return;
+
         switch(argumentCounter) {
             case 0:
                 arrayExpression = lexer.createArray(startPosition, endPosition);
@@ -59,7 +60,14 @@ public class Notation extends Command {
                 }
                 else {
                     // Get label
-                    String label = lexer.createString(startPosition, endPosition); // TODO: check if valid label, i.e. alphanumeric
+                    String label = lexer.createString(startPosition, endPosition);
+
+                    // Check if the label is valid
+                    if(!Label.valid(label)) {
+                        lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Not a valid label");
+                        error = true;
+                        return;
+                    }
 
                     // Replace the labelSet if still the default is used
                     if(labelSet == Scope.main.labelSenses)
@@ -81,12 +89,12 @@ public class Notation extends Command {
             return false;
 
         if (arrayExpression == null || arraySense == null) {
-            lexer.getInterpreter().error(lexer.tokenAt(0), "Command Notation requires at least two arguments"); // TODO: pass correct token
+            lexer.getInterpreter().error(firstToken, "Command Notation requires at least two arguments");
             return false;
         }
 
         if(argumentCounter % 2 != 0) {
-            lexer.getInterpreter().error(lexer.tokenAt(0), "Command Notation expected label but none passed"); // TODO: pass correct token
+            lexer.getInterpreter().error(firstToken, "Command Notation expected label but none passed");
             return false;
         }
 

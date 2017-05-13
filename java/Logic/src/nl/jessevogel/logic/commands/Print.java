@@ -27,6 +27,8 @@ public class Print extends Command {
     }
 
     void interpretArgument(int startPosition, int endPosition) {
+        if(error) return;
+
         switch(argumentCounter) {
             case 0:
                 setMessage(startPosition, endPosition);

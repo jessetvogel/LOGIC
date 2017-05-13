@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class FileManager {
 
-    private static String rootFile = "/Users/Jesse/Documents/logic/main.math";
+    private static String rootFile = "../../math/main.math"; // TODO: some other path, but this is handy while working on the project
 
     public static ArrayList<String> loadedFiles = new ArrayList<>();
 
@@ -26,6 +26,7 @@ public class FileManager {
     }
 
     public static void loadRootFile() {
-        loadFile(rootFile);
+        if(!loadFile(rootFile))
+            Log.warning("Root file " + rootFile + " was not found");
     }
 }

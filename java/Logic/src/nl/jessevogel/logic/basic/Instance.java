@@ -17,7 +17,7 @@ public class Instance {
 
         // If not yet a Relation was created, create a new one and put it in the map
         if(!relations.containsKey(type)) {
-            relations.put(type, new Relation(type, null));
+            relations.put(type, new Relation(type, null, null));
         }
 
         return Sense.createUnique(relations.get(type), null);

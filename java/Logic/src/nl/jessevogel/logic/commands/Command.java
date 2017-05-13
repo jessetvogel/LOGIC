@@ -49,16 +49,11 @@ public abstract class Command {
         if(commandName.equals("Define")) return new Define();
         if(commandName.equals("Notation")) return new Notation();
         if(commandName.equals("Let")) return new Let();
-
+        if(commandName.equals("Call")) return new Call();
 
         if(commandName.equals("Print")) return new Print();
 
         // If not in the list, return null
         return null;
-    }
-
-    public String getCommandName() {
-        // Return the command name
-        return commandName;
     }
 }
