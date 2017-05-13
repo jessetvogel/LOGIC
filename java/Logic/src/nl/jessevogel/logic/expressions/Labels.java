@@ -2,7 +2,6 @@ package nl.jessevogel.logic.expressions;
 
 import nl.jessevogel.logic.basic.Sense;
 import nl.jessevogel.logic.interpreter.Token;
-import nl.jessevogel.logic.log.Log;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;

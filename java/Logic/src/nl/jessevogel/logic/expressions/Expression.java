@@ -25,7 +25,7 @@ public class Expression {
         return tokens.length;
     }
 
-    public int find(ArrayList<Token> listToken, Map<Sense, Sense> placeholders) {
+    int find(ArrayList<Token> listToken, Map<Sense, Sense> placeholders) {
         int size = listToken.size();
         int maxStartingIndex = size - tokens.length;
 
@@ -51,7 +51,7 @@ public class Expression {
                     Sense sense1 = ((Token.SenseToken) token1).sense;
                     Sense sense2 = ((Token.SenseToken) token2).sense;
 
-                                        // TODO: this may be unnessasary, but yeah..
+                                        // TODO: this may be unnecessary, but yeah..
                                         if(!Placeholder.is(sense1)) {
                                             Log.error("Expression turns out to contain some SenseToken that is not a placeholder..");
                                             return -1;
@@ -85,24 +85,24 @@ public class Expression {
 
 
 //     TODO: remove this
-    public void print() {
-        for(Token token : tokens) {
-            if(token instanceof Token.CharToken)
-                System.out.print(((Token.CharToken) token).c);
-
-            if(token instanceof Token.StringToken)
-                System.out.print(((Token.StringToken) token).str);
-
-            if(token instanceof Token.SenseToken) {
-                Sense sense = ((Token.SenseToken) token).sense;
-                if(Placeholder.is(sense))
-                    System.out.print("<" + sense.relation.getType().relation.getLabel() + ">");
-                else
-                    System.out.print(sense.relation.getLabel());
-            }
-        }
-
-        System.out.println();
-    }
+//    public void print() {
+//        for(Token token : tokens) {
+//            if(token instanceof Token.CharToken)
+//                System.out.print(((Token.CharToken) token).c);
+//
+//            if(token instanceof Token.StringToken)
+//                System.out.print(((Token.StringToken) token).str);
+//
+//            if(token instanceof Token.SenseToken) {
+//                Sense sense = ((Token.SenseToken) token).sense;
+//                if(Placeholder.is(sense))
+//                    System.out.print("<" + sense.relation.getType().relation.getLabel() + ">");
+//                else
+//                    System.out.print(sense.relation.getLabel());
+//            }
+//        }
+//
+//        System.out.println();
+//    }
 }
 

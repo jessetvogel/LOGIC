@@ -7,12 +7,10 @@ import nl.jessevogel.logic.interpreter.Token;
 import nl.jessevogel.logic.log.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Rule {
 
-    public static final ArrayList<Rule> rules = new ArrayList<>();
+    static final ArrayList<Rule> rules = new ArrayList<>();
 
     private Expression expression;
     private Sense sense;
@@ -24,11 +22,11 @@ public class Rule {
     }
 
     public static void addRule(Expression expression, Sense sense) {
-        // Simply add a rule to the list of rules
-        rules.add(new Rule(expression, sense));
+        // Add a rule to the beginning of the list of rules, to make sure it gets applied before any earlier defined rule
+        rules.add(0, new Rule(expression, sense));
     }
 
-    public Expression getExpression() {
+    Expression getExpression() {
         return expression;
     }
 
@@ -47,13 +45,13 @@ public class Rule {
         ArrayList<Token> tokens = new ArrayList<>();
         tokens.add(new Token.StringToken(relation.getLabel()));
 
-        int n = relation.amountOfDependencies;
-        if(n > 0) {
+        if(relation.placeholders != null) {
+            int n = relation.amountOfDependencies;
             tokens.add(new Token.CharToken(Constant.CHARACTER_START_ARGUMENTS));
 
             for(int i = 0; i < n; i++) {
                 tokens.add(new Token.SenseToken(relation.placeholders[i]));
-                if (i < n - 1) tokens.add(new Token.CharToken(Constant.CHARACTER_ARGUMENTS_SEPARATOR));
+                if (i < n - 1) tokens.add(new Token.CharToken(Constant.CHARACTER_SEPARATOR_ARGUMENTS));
             }
 
             tokens.add(new Token.CharToken(Constant.CHARACTER_END_ARGUMENTS));

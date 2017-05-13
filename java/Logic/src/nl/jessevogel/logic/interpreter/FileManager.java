@@ -4,12 +4,14 @@ import nl.jessevogel.logic.log.Log;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FileManager {
 
     private static final String rootFile = "../../math/main.math"; // TODO: some other path, but this is handy while working on the project
 
-    private static ArrayList<String> loadedFiles = new ArrayList<>();
+    private static Set<String> loadedFiles = new HashSet<>();
 
     public static boolean loadFile(String filename) {
         // If the file was already loaded, just return true

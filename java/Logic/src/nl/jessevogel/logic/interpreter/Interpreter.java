@@ -1,6 +1,5 @@
 package nl.jessevogel.logic.interpreter;
 
-import nl.jessevogel.logic.commands.Command;
 import nl.jessevogel.logic.log.Log;
 
 import java.io.File;

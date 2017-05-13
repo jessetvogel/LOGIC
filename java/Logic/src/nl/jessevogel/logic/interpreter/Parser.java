@@ -1,18 +1,13 @@
 package nl.jessevogel.logic.interpreter;
 
+import nl.jessevogel.logic.basic.Constant;
 import nl.jessevogel.logic.commands.*;
 import nl.jessevogel.logic.log.Log;
 
-import java.util.ArrayList;
-
-public class Parser {
-
-    private static final char CHARACTER_START_ARGUMENT = '[';
-    private static final char CHARACTER_END_ARGUMENT = ']';
+class Parser {
 
     private Interpreter interpreter;
     private final Lexer lexer;
-    private ArrayList<Command> commands;
     private Token currentToken;
 
     Parser(String filename) {
@@ -20,7 +15,7 @@ public class Parser {
         lexer = new Lexer(filename);
     }
 
-    public void setInterpreter(Interpreter interpreter) {
+    void setInterpreter(Interpreter interpreter) {
         // Check if interpreter was already set, if so, give a warning
         if(this.interpreter != null)
             Log.warning("Trying to set interpreter, while it was already set");
@@ -34,14 +29,12 @@ public class Parser {
         // Analyze with the lexer!
         if(!lexer.analyze()) return false;
 
-        // Create a new list of commands
-        commands = new ArrayList<>();
+        // Keep reading commands and try to execute them
         currentToken = lexer.firstToken();
         Command command;
-        while((command = readCommand()) != null) {
-            // Add it to the list
-            if(!command.execute()) return false;
-        }
+        while((command = readCommand()) != null)
+            if(!command.execute())
+                return false;
 
         return lexer.reachedEnd();
     }
@@ -80,14 +73,14 @@ public class Parser {
         // First Token should be a '[', if we don't find it, return false
         if(!(currentToken instanceof Token.CharToken)) return false;
         Token.CharToken cToken = (Token.CharToken) currentToken;
-        if(cToken.c != CHARACTER_START_ARGUMENT) return false;
+        if(cToken.c != Constant.CHARACTER_START_COMMAND_ARGUMENT) return false;
 
         currentToken = lexer.nextToken();
 
         int startPosition = lexer.getPosition();
 
         // Read on until we find a ']'
-        while(!lexer.reachedEnd() && (!(currentToken instanceof Token.CharToken)) || ((Token.CharToken) currentToken).c != CHARACTER_END_ARGUMENT) {
+        while(!lexer.reachedEnd() && (!(currentToken instanceof Token.CharToken)) || ((Token.CharToken) currentToken).c != Constant.CHARACTER_END_COMMAND_ARGUMENT) {
             currentToken = lexer.nextToken();
         }
 
@@ -103,10 +96,5 @@ public class Parser {
         // Set the argument of the command, and return true
         command.addArgument(startPosition, endPosition);
         return true;
-    }
-
-    ArrayList<Command> getCommands() {
-        // Return the list of commands
-        return commands;
     }
 }

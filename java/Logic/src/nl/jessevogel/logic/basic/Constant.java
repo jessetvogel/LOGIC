@@ -25,9 +25,11 @@ public class Constant {
     public static Relation RELATION_AND;
 
     // Characters
+    public static final char CHARACTER_START_COMMAND_ARGUMENT = '[';
+    public static final char CHARACTER_END_COMMAND_ARGUMENT = ']';
     public static final char CHARACTER_START_ARGUMENTS = '(';
     public static final char CHARACTER_END_ARGUMENTS = ')';
-    public static final char CHARACTER_ARGUMENTS_SEPARATOR = ',';
+    public static final char CHARACTER_SEPARATOR_ARGUMENTS = ',';
     public static final char CHARACTER_NO_LABEL = '~';
 
     public static void initialize() {

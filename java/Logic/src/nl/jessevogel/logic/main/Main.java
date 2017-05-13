@@ -7,17 +7,15 @@ import nl.jessevogel.logic.log.Log;
 public class Main {
 
     public static void main(String[] args) {
-
-        Log.output("Initializing...");
-
         // Initialize all constants
+        Log.output("Initializing");
         Constant.initialize();
 
-        Log.output("Parsing root file");
-
         // Read main.math
+        Log.output("Parsing root file");
         FileManager.loadRootFile();
 
+        // Done
         Log.output("Done");
     }
 }

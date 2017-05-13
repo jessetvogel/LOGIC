@@ -3,8 +3,6 @@ package nl.jessevogel.logic.basic;
 import nl.jessevogel.logic.expressions.LabelSet;
 import nl.jessevogel.logic.log.Log;
 
-import java.util.HashMap;
-
 public class Relation {
 
     private static final LabelSet<Relation> labelSet = new LabelSet<>();

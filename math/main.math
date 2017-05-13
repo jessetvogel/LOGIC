@@ -2,7 +2,6 @@ Include[Propositions/main.math]
 Include[Sets/main.math]
 Include[Functions/main.math]
 
-
-
-
-Include[UnitTests/main.math]
+Let[f][Function]
+Label[X][Domain(f)]
+Label[Y][Range(f)]

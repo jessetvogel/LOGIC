@@ -7,22 +7,22 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Scanner {
+class Scanner {
 
     private final String filename;
     private String fileContents;
     private int fileLength;
-    public static final char CHARACTER_NEWLINE = '\n';
+    private static final char CHARACTER_NEWLINE = '\n';
 
     private int pointer, line, column;
     private char currentChar;
 
-    public Scanner(String filename) {
+    Scanner(String filename) {
         // Store the filename
         this.filename = filename;
     }
 
-    public boolean scan() {
+    boolean scan() {
         if(fileContents != null) {
             // If already scanned, give a warning and stop
             Log.warning("Scanner.scan() called while already scanned");
@@ -56,22 +56,17 @@ public class Scanner {
         }
     }
 
-    public String getFilename() {
-        // Return the name of the file
-        return filename;
-    }
-
-    public int getLine() {
+    int getLine() {
         // Return the current line number
         return line;
     }
 
-    public int getColumn() {
+    int getColumn() {
         // Return the current column number
         return column;
     }
 
-    public char firstCharacter() {
+    char firstCharacter() {
         if(fileContents == null) {
             // If not yet scanned, give a warning, and then scan
             Log.warning("Scanner.firstCharacter() was called, but there was not yet scanned");
@@ -86,7 +81,7 @@ public class Scanner {
         return currentChar;
     }
 
-    public char nextCharacter() {
+    char nextCharacter() {
         // If we already reached the end of the file, return 0
         if(reachedEnd()) return 0;
 
@@ -106,7 +101,7 @@ public class Scanner {
         return currentChar;
     }
 
-    public boolean reachedEnd() {
+    boolean reachedEnd() {
         return pointer == fileLength;
     }
 }

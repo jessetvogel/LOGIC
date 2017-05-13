@@ -1,10 +1,7 @@
 package nl.jessevogel.logic.expressions;
 
-import nl.jessevogel.logic.basic.Sense;
-import nl.jessevogel.logic.interpreter.Token;
 import nl.jessevogel.logic.log.Log;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -14,24 +11,18 @@ public class LabelSet<T> {
     private Map<String, T> labels;
     private ArrayList<LabelSet<T>> parents;
 
-    private boolean allowOverriding;
-
     public LabelSet() {
         // Create a new HashMap
         labels = new HashMap<>();
-
-        // Set default stuff
-        allowOverriding = false;
     }
 
     public boolean put(String label, T object) {
-        if(!allowOverriding && isSet(label)) {
-            // If this label was already used, give a warning
+        // Check if the label is already used
+        if(isSet(label)) {
             Log.warning("The label '" + label + "' was already used");
             return false;
         }
 
-        // Associate the label with the object
         labels.put(label, object);
         return true;
     }
@@ -57,8 +48,8 @@ public class LabelSet<T> {
 
         // Check if it is defined in some parent LabelSet
         if(parents != null) {
-            for(LabelSet<T> ls : parents)
-                if(ls.isSet(label))
+            for(LabelSet<T> labelSet : parents)
+                if(labelSet.isSet(label))
                     return true;
         }
 
@@ -66,16 +57,24 @@ public class LabelSet<T> {
         return false;
     }
 
-    public LabelSet<T> setAllowOverriding(boolean x) {
-        allowOverriding = x;
-        return this;
-    }
-
     public LabelSet<T> addParent(LabelSet<T> parent) {
-        // TODO: check for, and prevent if detected, recursion
+        // Check for recursion
+        if(parent.isParent(this)) {
+            Log.warning("LabelSet is already parent of its parent");
+            return this;
+        }
 
         if(parents == null) parents = new ArrayList<>();
         parents.add(parent);
         return this;
+    }
+
+    private boolean isParent(LabelSet<T> labelSet) {
+        if(labelSet == this) return true;
+        if(parents == null) return false;
+        for(LabelSet<T> l : parents)
+            if(l.isParent(labelSet))
+                return true;
+        return false;
     }
 }

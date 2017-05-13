@@ -19,7 +19,7 @@ public class Lexer {
     private int position;
     private Token currentToken;
 
-    public Lexer(String filename) {
+    Lexer(String filename) {
         // Setup for analyzing
         scanner = new Scanner(filename);
     }
@@ -32,7 +32,7 @@ public class Lexer {
         this.interpreter = interpreter;
     }
 
-    public boolean analyze() {
+    boolean analyze() {
         if(tokens != null) {
             // If already scanned, give a warning and stop
             Log.warning("Lexer.analyze() called while already analyzed");
@@ -111,7 +111,7 @@ public class Lexer {
         return null;
     }
 
-    public Token firstToken() {
+    Token firstToken() {
         if(tokens == null) {
             // If not yet analyzed, give a warning, and then analyze
             Log.warning("Scanner.firstToken() was called, but there was not yet analyzed");
@@ -129,7 +129,7 @@ public class Lexer {
         return currentToken;
     }
 
-    public Token nextToken() {
+    Token nextToken() {
         // If we already reached the end of the list of tokens, return null
         if(reachedEnd()) return null;
 
@@ -142,7 +142,7 @@ public class Lexer {
         return currentToken;
     }
 
-    public int getPosition() {
+    int getPosition() {
         // Return the current position
         return position;
     }
@@ -152,7 +152,7 @@ public class Lexer {
         return interpreter;
     }
 
-    public boolean reachedEnd() {
+    boolean reachedEnd() {
         return position == amountOfTokens;
     }
 
