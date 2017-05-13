@@ -63,7 +63,7 @@ public class Notation extends Command {
                     String label = lexer.createString(startPosition, endPosition);
 
                     // Check if the label is valid
-                    if(!Label.valid(label)) {
+                    if(!Labels.valid(label)) {
                         lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Not a valid label");
                         error = true;
                         return;
@@ -99,12 +99,16 @@ public class Notation extends Command {
         }
 
         // Substitute all tokens
-        labelSet.substituteTokens(arrayExpression);
-        labelSet.substituteTokens(arraySense);
+        Labels.apply(labelSet, arrayExpression);
+        Labels.apply(labelSet, arraySense);
 
         // Create a new rule
-        Expression expression = new Expression(arrayExpression);
         Sense sense = (new ExpressionParser(arraySense)).parse();
+        if(sense == null) {
+            lexer.getInterpreter().error(arraySense.get(0), "Could not parse argument");
+            return false;
+        }
+        Expression expression = new Expression(arrayExpression);
         Rule.addRule(expression, sense);
 
         return true;

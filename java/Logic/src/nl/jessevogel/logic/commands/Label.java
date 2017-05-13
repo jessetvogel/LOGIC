@@ -2,16 +2,19 @@ package nl.jessevogel.logic.commands;
 
 import nl.jessevogel.logic.basic.*;
 import nl.jessevogel.logic.expressions.ExpressionParser;
-import nl.jessevogel.logic.expressions.Label;
+import nl.jessevogel.logic.expressions.Labels;
+import nl.jessevogel.logic.interpreter.Token;
 
-public class Call extends Command {
+import java.util.ArrayList;
+
+public class Label extends Command {
 
     /*
         Syntax:
-            Call[label][sense]
+            Label[label][sense]
      */
 
-    private static final String COMMAND_NAME = "Call";
+    private static final String COMMAND_NAME = "Label";
 
     private int argumentCounter;
     private String label;
@@ -19,7 +22,7 @@ public class Call extends Command {
 
     private boolean error;
 
-    Call() {
+    Label() {
         // Set values belonging to this command
         commandName = COMMAND_NAME;
 
@@ -67,7 +70,7 @@ public class Call extends Command {
     private void setLabel(int startPosition, int endPosition) {
         // Check if the label has the correct type name pattern
         String label = lexer.createString(startPosition, endPosition);
-        if(!Label.valid(label)) {
+        if(!Labels.valid(label)) {
             lexer.getInterpreter().error(lexer.tokenAt(startPosition),"Relation label may only contain alphanumerical characters");
             error = true;
             return;
@@ -84,15 +87,19 @@ public class Call extends Command {
     }
 
     private void setSense(int startPosition, int endPosition) {
-        // Find the type of the relation, and check if it exists
-        Sense sense = (new ExpressionParser(Scope.main.labelSenses.substituteTokens(lexer.createArray(startPosition, endPosition)))).parse();
+        // First apply the known labels
+        ArrayList<Token> senseTokens = lexer.createArray(startPosition, endPosition);
+        Labels.apply(Scope.main.labelSenses, senseTokens);
+
+        // Parse the given expression
+        Sense sense = (new ExpressionParser(senseTokens)).parse();
         if(sense == null) {
             lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Was not able to parse the provided argument");
             error = true;
             return;
         }
 
-        // Store the type
+        // Store the sense
         this.sense = sense;
     }
 }

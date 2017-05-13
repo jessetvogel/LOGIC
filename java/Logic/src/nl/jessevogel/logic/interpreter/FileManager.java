@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 public class FileManager {
 
-    private static String rootFile = "../../math/main.math"; // TODO: some other path, but this is handy while working on the project
+    private static final String rootFile = "../../math/main.math"; // TODO: some other path, but this is handy while working on the project
 
-    public static ArrayList<String> loadedFiles = new ArrayList<>();
+    private static ArrayList<String> loadedFiles = new ArrayList<>();
 
     public static boolean loadFile(String filename) {
         // If the file was already loaded, just return true

@@ -1,0 +1,3 @@
+Notation[!p][Not(p)][Proposition][p]
+Notation[p or q][Or(p, q)][Proposition][p][Proposition][q]
+Notation[p and q][And(p, q)][Proposition][p][Proposition][q]

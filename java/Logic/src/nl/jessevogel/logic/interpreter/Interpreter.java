@@ -11,15 +11,15 @@ public class Interpreter {
     private final String workingDirectory;
     private final Parser parser;
 
-    public Interpreter(String filename) {
+    Interpreter(String filename) {
         // Setup for interpreting
-        this.filename = filename;
+        this.filename = (new File(filename)).getAbsolutePath();
         parser = new Parser(filename);
         parser.setInterpreter(this);
         workingDirectory = (new File(filename)).getParent();
     }
 
-    public boolean interpret() {
+    boolean interpret() {
         // Parse with the parser!
         return parser.parse();
     }

@@ -118,6 +118,11 @@ public class Lexer {
             analyze();
         }
 
+        if(tokens.size() == 0) {
+            position = 0;
+            return null;
+        }
+
         // Set position to beginning, and return the first character
         position = 0;
         currentToken = tokens.get(0);

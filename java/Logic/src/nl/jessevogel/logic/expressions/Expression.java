@@ -84,8 +84,7 @@ public class Expression {
 
 
 
-    // TODO: remove this
-
+//     TODO: remove this
     public void print() {
         for(Token token : tokens) {
             if(token instanceof Token.CharToken)
@@ -105,6 +104,5 @@ public class Expression {
 
         System.out.println();
     }
-
 }
 

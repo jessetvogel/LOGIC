@@ -5,12 +5,10 @@ import nl.jessevogel.logic.basic.Relation;
 import nl.jessevogel.logic.basic.Scope;
 import nl.jessevogel.logic.basic.Sense;
 import nl.jessevogel.logic.expressions.*;
-import nl.jessevogel.logic.expressions.Label;
+import nl.jessevogel.logic.expressions.Labels;
 import nl.jessevogel.logic.interpreter.Token;
-import nl.jessevogel.logic.log.Log;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 public class Define extends Command {
 
@@ -20,10 +18,6 @@ public class Define extends Command {
      */
 
     private static final String COMMAND_NAME = "Define";
-    private static final char CHARACTER_START_ARGUMENTS = '(';
-    private static final char CHARACTER_END_ARGUMENTS = ')';
-    private static final char CHARACTER_ARGUMENTS_SEPARATOR = ',';
-    private static final char CHARACTER_NO_LABEL = '~';
 
     private int argumentCounter;
     private String label;
@@ -97,7 +91,8 @@ public class Define extends Command {
         }
 
         // Determine the type at last, because it may refer to some of the arguments
-        Sense type = (new ExpressionParser(labelSet.substituteTokens(typeTokens))).parse();
+        Labels.apply(labelSet, typeTokens);
+        Sense type = (new ExpressionParser(typeTokens)).parse();
         if(type == null) {
             lexer.getInterpreter().error(typeTokens.get(0), "Was not able to parse the provided argument");
             return false;
@@ -110,41 +105,15 @@ public class Define extends Command {
         }
 
         // Create the relation and give it a label
-        Relation relation = (new Relation(type, placeholders, types))
-                .setLabel(label);
-
-        /* Automatically create a rule for this expression of the form:
-         *
-         *      label(dependency 1, dependency 2, ... , dependency n)
-         *
-         */
-
-        // TODO: create a separate method for this, somewhere in some Expression type of class
-        ArrayList<Token> tokens = new ArrayList<>();
-        tokens.add(new Token.StringToken(label));
-
-        if(amountOfDependencies > 0) {
-            tokens.add(new Token.CharToken(CHARACTER_START_ARGUMENTS));
-
-            for(int i = 0; i < amountOfDependencies; i++) {
-                tokens.add(new Token.SenseToken(placeholders[i]));
-                if (i < amountOfDependencies - 1)
-                    tokens.add(new Token.CharToken(CHARACTER_ARGUMENTS_SEPARATOR));
-            }
-
-            tokens.add(new Token.CharToken(CHARACTER_END_ARGUMENTS));
-        }
-
-        Expression expression = new Expression(tokens);
-        Sense sense = Sense.create(relation, placeholders);
-        Rule.addRule(expression, sense);
+        Relation relation = (new Relation(type, placeholders, types)).setLabel(label);
+        Rule.addRuleFromRelation(relation);
         return true;
     }
 
     private void setLabel(int startPosition, int endPosition) {
         // Check if the label has the correct type name pattern
         String label = lexer.createString(startPosition, endPosition);
-        if(!Label.valid(label)) {
+        if(!Labels.valid(label)) {
             lexer.getInterpreter().error(lexer.tokenAt(startPosition),"Relation label may only contain alphanumerical characters");
             error = true;
             return;
@@ -168,7 +137,9 @@ public class Define extends Command {
 
     private void addDependency(int startPosition, int endPosition) {
         // Parse the sense
-        lastDependencyType = (new ExpressionParser(labelSet.substituteTokens(lexer.createArray(startPosition, endPosition)))).parse();
+        ArrayList<Token> senseTokens = lexer.createArray(startPosition, endPosition);
+        Labels.apply(labelSet, senseTokens);
+        lastDependencyType = (new ExpressionParser(senseTokens)).parse();
         if(lastDependencyType == null) {
             lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Was not able to parse the provided argument");
             error = true;
@@ -197,7 +168,7 @@ public class Define extends Command {
 
         // Give the placeholder a label if asked for
         String label = lexer.createString(startPosition, endPosition);
-        if(label.length() == 1 && label.charAt(0) == CHARACTER_NO_LABEL) return;
+        if(label.length() == 1 && label.charAt(0) == Constant.CHARACTER_NO_LABEL) return;
 
         // TODO: check if valid label
 

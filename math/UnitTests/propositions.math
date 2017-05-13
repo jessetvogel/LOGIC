@@ -1,0 +1,9 @@
+Let[p][Proposition]
+Let[q][Proposition]
+
+Label[t][true]
+Label[f][false]
+
+Label[u][p and q]
+Label[v][p or q]
+Label[w][!p]

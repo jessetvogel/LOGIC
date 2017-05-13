@@ -78,28 +78,4 @@ public class LabelSet<T> {
         parents.add(parent);
         return this;
     }
-
-    public ArrayList<Token> substituteTokens(ArrayList<Token> tokens) {
-        int size = tokens.size();
-        for(int i = 0; i < size; i ++) {
-            Token token = tokens.get(i);
-
-            if(token instanceof Token.StringToken) {
-                String str = ((Token.StringToken) token).str;
-                if(isSet(str)) {
-                    T sense = get(str);
-
-                                            // TODO: do this in a better way
-                                            if(!(sense instanceof Sense)) {
-                                                Log.warning("Tried to apply substituteTokens to a labelSet which does not contains senses");
-                                                return tokens;
-                                            }
-
-                    tokens.remove(i);
-                    tokens.add(i, new Token.SenseToken((Sense) sense));
-                }
-            }
-        }
-        return tokens;
-    }
 }

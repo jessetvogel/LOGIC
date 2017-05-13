@@ -2,6 +2,9 @@ package nl.jessevogel.logic.commands;
 
 import nl.jessevogel.logic.basic.*;
 import nl.jessevogel.logic.expressions.*;
+import nl.jessevogel.logic.interpreter.Token;
+
+import java.util.ArrayList;
 
 public class Let extends Command {
 
@@ -73,7 +76,7 @@ public class Let extends Command {
     private void setLabel(int startPosition, int endPosition) {
         // Check if the label has the correct type name pattern
         String label = lexer.createString(startPosition, endPosition);
-        if(!Label.valid(label)) {
+        if(!Labels.valid(label)) {
             lexer.getInterpreter().error(lexer.tokenAt(startPosition),"Relation label may only contain alphanumerical characters");
             error = true;
             return;
@@ -91,7 +94,9 @@ public class Let extends Command {
 
     private void setType(int startPosition, int endPosition) {
         // Find the type of the relation, and check if it exists
-        Sense type = (new ExpressionParser(Scope.main.labelSenses.substituteTokens(lexer.createArray(startPosition, endPosition)))).parse();
+        ArrayList<Token> typeTokens = lexer.createArray(startPosition, endPosition);
+        Labels.apply(Scope.main.labelSenses, typeTokens);
+        Sense type = (new ExpressionParser(typeTokens)).parse();
         if(type == null) {
             lexer.getInterpreter().error(lexer.tokenAt(startPosition), "Was not able to parse the provided argument");
             error = true;

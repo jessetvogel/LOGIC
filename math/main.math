@@ -1,7 +1,8 @@
+Include[Propositions/main.math]
 Include[Sets/main.math]
 Include[Functions/main.math]
 
 
 
 
-Include[UnitTests/notation.math]
+Include[UnitTests/main.math]

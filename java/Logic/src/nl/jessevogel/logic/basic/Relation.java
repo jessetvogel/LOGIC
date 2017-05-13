@@ -42,7 +42,7 @@ public class Relation {
     public Relation setLabel(String label) {
         // Check if the label has already been set
         if(this.label != null) {
-            Log.warning("Call of Relation '" + this.label + "' was already set");
+            Log.warning("Label of Relation '" + this.label + "' was already set");
             return this;
         }
 

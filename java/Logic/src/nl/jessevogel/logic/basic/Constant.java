@@ -1,6 +1,7 @@
 package nl.jessevogel.logic.basic;
 
 import nl.jessevogel.logic.expressions.Expression;
+import nl.jessevogel.logic.expressions.Placeholder;
 import nl.jessevogel.logic.expressions.Rule;
 import nl.jessevogel.logic.interpreter.Token;
 
@@ -23,6 +24,12 @@ public class Constant {
     public static Relation RELATION_OR;
     public static Relation RELATION_AND;
 
+    // Characters
+    public static final char CHARACTER_START_ARGUMENTS = '(';
+    public static final char CHARACTER_END_ARGUMENTS = ')';
+    public static final char CHARACTER_ARGUMENTS_SEPARATOR = ',';
+    public static final char CHARACTER_NO_LABEL = '~';
+
     public static void initialize() {
 
         // Create standard types
@@ -41,9 +48,9 @@ public class Constant {
         Constant.PROPOSITION_FALSE = Instance.create(Constant.TYPE_PROPOSITION);
 
         // Create logical Relations
-        Constant.RELATION_NOT = (new Relation(Constant.TYPE_PROPOSITION, null, new Sense[] { Constant.TYPE_PROPOSITION })).setLabel("Not");
-        Constant.RELATION_OR = (new Relation(Constant.TYPE_PROPOSITION, null, new Sense[] { Constant.TYPE_PROPOSITION, Constant.TYPE_PROPOSITION })).setLabel("Or");
-        Constant.RELATION_AND = (new Relation(Constant.TYPE_PROPOSITION, null, new Sense[] { Constant.TYPE_PROPOSITION, Constant.TYPE_PROPOSITION })).setLabel("And");
+        Constant.RELATION_NOT = (new Relation(Constant.TYPE_PROPOSITION, new Sense[] { Placeholder.create(Constant.TYPE_PROPOSITION) }, new Sense[] { Constant.TYPE_PROPOSITION })).setLabel("Not");
+        Constant.RELATION_OR = (new Relation(Constant.TYPE_PROPOSITION, new Sense[] { Placeholder.create(Constant.TYPE_PROPOSITION), Placeholder.create(Constant.TYPE_PROPOSITION) }, new Sense[] { Constant.TYPE_PROPOSITION, Constant.TYPE_PROPOSITION })).setLabel("Or");
+        Constant.RELATION_AND = (new Relation(Constant.TYPE_PROPOSITION, new Sense[] { Placeholder.create(Constant.TYPE_PROPOSITION), Placeholder.create(Constant.TYPE_PROPOSITION) }, new Sense[] { Constant.TYPE_PROPOSITION, Constant.TYPE_PROPOSITION })).setLabel("And");
 
         // Create the main scope and create some referents
         Scope.main = new Scope();
@@ -58,5 +65,9 @@ public class Constant {
 
         Rule.addRule(new Expression(new Token[] { new Token.StringToken("true") }), Constant.PROPOSITION_TRUE);
         Rule.addRule(new Expression(new Token[] { new Token.StringToken("false") }), Constant.PROPOSITION_FALSE);
+
+        Rule.addRuleFromRelation(Constant.RELATION_NOT);
+        Rule.addRuleFromRelation(Constant.RELATION_OR);
+        Rule.addRuleFromRelation(Constant.RELATION_AND);
     }
 }
